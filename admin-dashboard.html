@@ -1,0 +1,83 @@
+<div class="container">
+    <h1>لوحة التحكم <small>المسؤول</small></h1>
+    
+    <div class="admin-sections">
+        <!-- قسم إدارة المستخدمين -->
+        <div class="admin-card">
+            <h2>إدارة المستخدمين</h2>
+            <div id="usersList"></div>
+            <button id="exportUsers" class="btn">تصدير كـ JSON</button>
+        </div>
+        
+        <!-- قسم سجل الزوار -->
+        <div class="admin-card">
+            <h2>سجل الزوار</h2>
+            <div id="visitsList"></div>
+            <button id="exportVisits" class="btn">تصدير السجل</button>
+        </div>
+        
+        <!-- قسم النسخ الاحتياطي -->
+        <div class="admin-card">
+            <h2>النسخ الاحتياطي</h2>
+            <button id="createBackup" class="btn">إنشاء نسخة احتياطية</button>
+            <button id="restoreBackup" class="btn">استعادة نسخة</button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    // تحميل البيانات
+    const [users, visits] = await Promise.all([
+        fetchUsers(),
+        fetchVisits()
+    ]);
+    
+    // عرض المستخدمين
+    const usersList = document.getElementById('usersList');
+    usersList.innerHTML = users.map(user => `
+        <div class="user-item">
+            <span>${user.email}</span>
+            <button data-id="${user.id}" class="edit-btn">تعديل</button>
+        </div>
+    `).join('');
+    
+    // عرض الزيارات
+    const visitsList = document.getElementById('visitsList');
+    visitsList.innerHTML = visits.map(visit => `
+        <div class="visit-item">
+            <div>${visit.email} (${visit.userType})</div>
+            <small>${new Date(visit.timestamp).toLocaleString()}</small>
+        </div>
+    `).join('');
+    
+    // تصدير البيانات
+    document.getElementById('exportUsers').addEventListener('click', () => {
+        exportToJSON(users, 'users_backup.json');
+    });
+    
+    document.getElementById('exportVisits').addEventListener('click', () => {
+        exportToJSON(visits, 'visits_backup.json');
+    });
+});
+
+async function fetchUsers() {
+    const response = await fetch('/api/users');
+    return await response.json();
+}
+
+async function fetchVisits() {
+    const response = await fetch('/api/visits');
+    return await response.json();
+}
+
+function exportToJSON(data, filename) {
+    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+</script>
