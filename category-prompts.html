@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="htmlRoot">
+<head>
+  <meta charset="UTF-8" />
+  <title>برومبتات {category}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"  rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9fafb;
+      color: #1f2937;
+      line-height: 1.6;
+    }
+    .line-clamp-3 {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    @media (max-width: 640px) {
+      html { font-size: 16px; }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 p-4">
+
+  <!-- Banner -->
+  <div class="mb-6">
+    <img src="ToolBar1.png" alt="بانير موقع Promptica" class="w-full h-auto rounded-lg shadow-md object-cover max-h-64">
+  </div>
+
+  <!-- Header -->
+  <header class="mb-6 flex justify-between items-center rtl:space-x-reverse space-x-4">
+    <button onclick="goBack()" class="flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-100 text-gray-700 rounded-full shadow transition-all duration-300">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      العودة
+    </button>
+    <button id="langToggle" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-md hover:shadow-lg transition transform hover:scale-105 focus:outline-none">
+      English
+    </button>
+  </header>
+
+  <!-- Page Title -->
+  <h1 id="page-title" class="text-3xl sm:text-4xl font-bold flex justify-center items-center gap-3 mb-6"></h1>
+
+  <!-- Level Filter Buttons -->
+  <section class="mb-6 max-w-4xl mx-auto text-center">
+    <div class="inline-flex flex-wrap gap-2 justify-center p-2 bg-white rounded-lg shadow-sm border border-gray-200">
+      <button onclick="filterByLevel('all')" class="px-3 py-1 text-xs rounded-full font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 transition">🌍 الكل</button>
+      <button onclick="filterByLevel('مبتدئ')" class="px-3 py-1 text-xs rounded-full font-medium bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition">🎓 مبتدئ</button>
+      <button onclick="filterByLevel('متوسط')" class="px-3 py-1 text-xs rounded-full font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition">🎯 متوسط</button>
+      <button onclick="filterByLevel('محترف')" class="px-3 py-1 text-xs rounded-full font-medium bg-purple-100 text-purple-800 hover:bg-purple-200 transition">🏆 محترف</button>
+    </div>
+  </section>
+
+  <!-- Search Bar -->
+  <section class="mb-6 max-w-4xl mx-auto">
+    <div class="relative">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder=""
+        class="w-full p-4 pl-12 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+      <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400 text-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+      <div class="mt-2 bg-gray-100 p-2 rounded-md shadow-sm text-sm text-gray-600">
+        ابحث هنا (#قسم، @كلمة، :توكن)
+      </div>
+    </div>
+  </section>
+  
+   <!-- Feedback Modal -->
+  <div id="feedbackModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
+    <div class="bg-white w-full max-w-md p-6 rounded-lg shadow-lg relative">
+      <h3 class="text-xl font-bold mb-4">إضافة تعليق</h3>
+      <button 
+        onclick="document.getElementById('feedbackModal').classList.add('hidden')"
+        class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+
+      <form id="feedbackForm" class="space-y-4 mt-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">اسمك (اختياري)</label>
+          <input type="text" name="name" placeholder="أدخل اسمك..." class="w-full border border-gray-300 p-2 rounded"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">بريدك الإلكتروني (اختياري)</label>
+          <input type="email" name="email" placeholder="example@email.com" class="w-full border border-gray-300 p-2 rounded"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">نوع التعليق</label>
+          <select name="type" class="w-full border border-gray-300 p-2 rounded">
+            <option value="suggestion">اقتراح تحسين</option>
+            <option value="bug">ابلاغ عن خطأ</option>
+            <option value="design">ملاحظات على التصميم</option>
+            <option value="translation">ملاحظات على الترجمة</option>
+            <option value="other">أخرى</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">محتوى التعليق</label>
+          <textarea name="message" rows="4" placeholder="اكتب تعليقك هنا..." class="w-full border border-gray-300 p-2 rounded"></textarea>
+        </div>
+        <div class="flex justify-end space-x-2">
+          <button 
+            type="button" 
+            onclick="document.getElementById('feedbackModal').classList.add('hidden')" 
+            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded">إلغاء</button>
+          <button 
+            type="submit" 
+            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded">إرسال</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Level Statistics Cards -->
+  <section class="mb-6 max-w-4xl mx-auto">
+    <div class="bg-white p-4 rounded-lg shadow-sm flex flex-wrap justify-between items-center gap-4">
+      <div id="levelStats" class="flex space-x-6 rtl:space-x-reverse text-sm sm:text-base">
+      </div>
+      <div id="totalPromptCount" class="text-indigo-700 font-semibold text-sm sm:text-base">
+      </div>
+    </div>
+  </section>
+
+  <!-- Cards Container -->
+  <main class="max-w-4xl mx-auto space-y-4" id="prompts-container">
+  </main>
+  <!-- Footer -->
+
+  <footer class="mt-12 text-center text-sm text-gray-500">
+      <!-- Feedback Button -->
+  <section class="mb-6 max-w-4xl mx-auto">
+    <div class="text-center">
+      <button 
+        onclick="document.getElementById('feedbackModal').classList.remove('hidden')"
+        class="px-4 py-2 bg-green-100 text-green-700 hover:bg-green-200 rounded-full transition"
+      >
+        💬 إضافة تعليق
+      </button>
+    </div>
+  </section>
+    &copy; <span id="currentYear"></span> Promptica. جميع الحقوق محفوظة.
+  </footer>
+
+  <!-- EmailJS Script -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script> 
+  <script>
+  // دالة العودة للصفحة السابقة//
+  function goBack() {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = 'index.html';
+    }
+  }
+    // EmailJS Configuration (Replace with your credentials)
+    emailjs.init("qTN652aGlDuG_GHW8"); 
+
+    // Feedback Form Handling
+      // إضافة التعليقات إلى localStorage
+  document.getElementById("feedbackForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const data = new FormData(form);
+    
+        // إرسال عبر EmailJS (إذا كنت تريد)
+    const templateParams = {
+      from_name: data.get("name"),
+      from_email: data.get("email"),
+      comment_type: data.get("type"),
+      message: data.get("message")
+    };
+
+    
+    // حفظ التعليق
+  // في نموذج التعليقات (category-prompts.html)
+const newComment = {
+  id: Date.now(),
+  user: data.get("name") || "مجهول",
+  email: data.get("email") || "",
+  type: data.get("type"),
+  message: data.get("message").trim(),
+  compliant: null, // حالة الالتزام (غير محددة)
+  replies: [] // قائمة بالردود
+};
+    
+    let existingComments = JSON.parse(localStorage.getItem('comments')) || [];
+    existingComments.push(newComment);
+    localStorage.setItem('comments', JSON.stringify(existingComments));
+    
+      // Send via EmailJS
+      emailjs.send("service_1zryckl", "template_su31gvu", templateParams).then(() => {
+        alert("✅ تم إرسال التعليق بنجاح!");
+        form.reset();
+        document.getElementById('feedbackModal').classList.add('hidden');
+      }, (err) => {
+        alert("❌ خطأ في الإرسال: " + err.text);
+      });
+    });
+    // Language Setup
+    const savedLang = localStorage.getItem('language') || 'ar';
+    document.documentElement.setAttribute('lang', savedLang);
+    document.documentElement.setAttribute('dir', savedLang === 'ar' ? 'rtl' : 'ltr');
+
+    const translations = {
+      ar: {
+        pageTitle: "برومبتات",
+        searchPlaceholder: "🔍 ابحث هنا (#قسم، @كلمة، :توكن)",
+        copyButton: "📋 نسخ",
+        copiedText: "✅ تم النسخ!",
+        noPrompts: "لا توجد برومبتات تناسب البحث.",
+        categoryLabel: "📁 القسم",
+        tokensLabel: "🔢 الكلمات",
+        moreText: "أكثر",
+        lessText: "أقل"
+      },
+      en: {
+        pageTitle: "Prompts for",
+        searchPlaceholder: "🔍 Search here (#category, @word, :token)",
+        copyButton: "📋 Copy",
+        copiedText: "Copied!",
+        noPrompts: "No prompts match your search.",
+        categoryLabel: "📁 Category",
+        tokensLabel: "Tokens",
+        moreText: "More",
+        lessText: "Less"
+      }
+    };
+
+    // Theme Mapping
+    const themeMap = {
+      "الذكاء الصناعي التوليدي": {
+        bgColor: "bg-blue-50", textColor: "text-blue-800", icon: "🧠"
+      },
+      "التعليم التفاعلي": {
+        bgColor: "bg-indigo-50", textColor: "text-indigo-800", icon: "📚"
+      },
+      "تطوير مهارات الطلاب": {
+        bgColor: "bg-green-50", textColor: "text-green-800", icon: "👩‍🎓"
+      },
+      default: {
+        bgColor: "bg-gray-50", textColor: "text-gray-800", icon: "📄"
+      }
+    };
+
+    // Get URL Parameters
+    const params = new URLSearchParams(window.location.search);
+    const category = decodeURIComponent(params.get('category') || '');
+    const subCategory = decodeURIComponent(params.get('subCategory') || '');
+    const level = decodeURIComponent(params.get('level') || 'all');
+
+    // Theme Setup
+    const selectedTheme = themeMap[subCategory] || themeMap[category] || themeMap.default;
+    document.body.className = `min-h-screen ${selectedTheme.bgColor} p-4`;
+
+    // Page Title
+    function updatePageTitle() {
+      const pageTitle = document.getElementById("page-title");
+      pageTitle.innerHTML = `
+        <span class="text-3xl">${selectedTheme.icon}</span>
+        <span class="${selectedTheme.textColor} text-xl sm:text-2xl">${subCategory || category}</span>
+      `;
+    }
+
+    // Get Prompts from Storage
+    let prompts = JSON.parse(localStorage.getItem("prompts")) || [];
+
+    // Filter by Category/Subcategory
+    let filteredPrompts = [...prompts];
+    if (category) {
+      filteredPrompts = filteredPrompts.filter(p => p.category === category);
+    } else if (subCategory) {
+      filteredPrompts = filteredPrompts.filter(p => p.subCategory === subCategory);
+    }
+
+    // Level Filtering
+    let currentLevelFilter = level;
+    function filterByLevel(newLevel) {
+      currentLevelFilter = newLevel;
+      performSearch(document.getElementById("searchInput").value.trim());
+    }
+
+    // Advanced Search
+    function performSearch(query) {
+      let results = [...filteredPrompts];
+      if (query) {
+        const filters = {
+          category: [],
+          subCategory: [],
+          tokens: [],
+          text: []
+        };
+        const parts = query.toLowerCase().split(/\s+/);
+        parts.forEach(part => {
+          if (part.startsWith('#')) filters.category.push(part.slice(1));
+          if (part.startsWith('@')) filters.subCategory.push(part.slice(1));
+          if (part.startsWith(':')) {
+            const tokenCount = parseInt(part.slice(1));
+            if (!isNaN(tokenCount)) filters.tokens.push(tokenCount);
+          } else {
+            filters.text.push(part);
+          }
+        });
+
+        results = results.filter(prompt => {
+          let match = true;
+          if (filters.category.length > 0) match &&= filters.category.some(c => prompt.category.includes(c));
+          if (filters.subCategory.length > 0) match &&= filters.subCategory.some(s => prompt.subCategory.includes(s));
+          if (filters.tokens.length > 0) match &&= filters.tokens.every(t => prompt.tokens >= t);
+          if (filters.text.length > 0) match &&= filters.text.every(w => prompt.text.toLowerCase().includes(w));
+          return match;
+        });
+      }
+
+      // Apply Level Filter
+      if (currentLevelFilter !== 'all') {
+        results = results.filter(p => p.level === currentLevelFilter);
+      }
+
+      renderPrompts(results);
+    }
+
+    // Render Prompts
+    const container = document.getElementById("prompts-container");
+    function renderPrompts(data) {
+      container.innerHTML = "";
+      if (data.length === 0) {
+        container.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-md text-center text-gray-500">${translations[savedLang].noPrompts}</div>`;
+        return;
+      }
+
+      showLevelStatistics(data);
+
+      data.forEach(prompt => {
+        const card = document.createElement("div");
+        let bgColor = "bg-white";
+        let textColor = "text-gray-800";
+        let borderColor = "border-gray-200";
+
+        if (prompt.level === 'مبتدئ') {
+          bgColor = "bg-yellow-50 border-l-4 border-yellow-400";
+          textColor = "text-yellow-800";
+        } else if (prompt.level === 'متوسط') {
+          bgColor = "bg-blue-50 border-l-4 border-blue-400";
+          textColor = "text-blue-800";
+        } else if (prompt.level === 'محترف') {
+          bgColor = "bg-purple-50 border-l-4 border-purple-400";
+          textColor = "text-purple-800";
+        }
+
+        card.className = `p-6 rounded-lg shadow hover:shadow-lg transition-all duration-300 ${bgColor} ${textColor}`;
+        card.setAttribute('data-expanded', 'false'); // <<<<<<< هنا
+
+        // Create Elements
+        const textElement = document.createElement("p");
+        textElement.className = "mb-4 text-gray-700";
+        textElement.textContent = prompt.text.substring(0, 120) + (prompt.text.length > 120 ? "..." : "");
+
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "flex justify-between items-center text-xs sm:text-sm text-gray-500 mt-4 pt-3 border-t border-gray-100";
+
+        const categorySpan = document.createElement("span");
+        categorySpan.textContent = `${prompt.category}${prompt.subCategory ? ` / ${prompt.subCategory}` : ''}`;
+
+        const copyButton = document.createElement("button");
+        copyButton.className = "flex items-center gap-1 text-indigo-600 hover:text-indigo-800 cursor-pointer transition";
+        copyButton.innerHTML = `
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+          </svg>
+          <span>${translations[savedLang].copyButton}</span>
+        `;
+
+        // Expand Button
+        const toggleBtn = document.createElement("button");
+        toggleBtn.className = "mt-2 text-xs text-indigo-600 hover:text-indigo-800 cursor-pointer";
+        toggleBtn.textContent = translations[savedLang].moreText;
+
+        // Event Listeners
+        copyButton.onclick = (e) => copyPrompt(prompt.text, e.target);
+        toggleBtn.onclick = () => {
+          const currentState = card.getAttribute('data-expanded') === 'true';
+          card.setAttribute('data-expanded', !currentState);
+          textElement.textContent = !currentState 
+            ? prompt.text 
+            : prompt.text.substring(0, 120) + (prompt.text.length > 120 ? "..." : "");
+          toggleBtn.textContent = !currentState 
+            ? translations[savedLang].lessText 
+            : translations[savedLang].moreText;
+        };
+
+        // Build Card Structure
+        infoDiv.appendChild(categorySpan);
+        infoDiv.appendChild(copyButton);
+        card.appendChild(textElement);
+        card.appendChild(infoDiv);
+        card.appendChild(toggleBtn);
+
+        container.appendChild(card);
+      });
+    }
+
+    // Copy Prompt Function
+    function copyPrompt(text, element) {
+      navigator.clipboard.writeText(text).then(() => {
+        element.innerHTML = `<svg class="w-4 h-4 text-green-600" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/></svg> ${translations[savedLang].copiedText}`;
+        setTimeout(() => {
+          element.textContent = translations[savedLang].copyButton;
+          element.querySelector('svg').remove();
+        }, 1500);
+      }).catch(() => alert("❌ فشل النسخ"));
+    }
+
+    // Level Statistics
+    function showLevelStatistics(data) {
+      const beginner = data.filter(p => p.level === 'مبتدئ').length;
+      const intermediate = data.filter(p => p.level === 'متوسط').length;
+      const advanced = data.filter(p => p.level === 'محترف').length;
+      const total = data.length;
+
+      const lang = savedLang;
+      const statsDiv = document.getElementById("levelStats");
+      const totalDiv = document.getElementById("totalPromptCount");
+
+      if (lang === 'ar') {
+        statsDiv.innerHTML = `
+          <span class="text-yellow-600">🎓 مبتدئ: <strong>${beginner}</strong></span>
+          <span class="text-blue-600">🎯 متوسط: <strong>${intermediate}</strong></span>
+          <span class="text-purple-600">🏆 محترف: <strong>${advanced}</strong></span>
+        `;
+        totalDiv.textContent = `المجموع: ${total}`;
+      } else {
+        statsDiv.innerHTML = `
+          <span class="text-yellow-600">Beginner: <strong>${beginner}</strong></span>
+          <span class="text-blue-600">Intermediate: <strong>${intermediate}</strong></span>
+          <span class="text-purple-600">Advanced: <strong>${advanced}</strong></span>
+        `;
+        totalDiv.textContent = `Total: ${total}`;
+      }
+    }
+
+    // Setup
+    document.getElementById("searchInput").placeholder = translations[savedLang].searchPlaceholder;
+    document.getElementById("searchInput").addEventListener("input", e => performSearch(e.target.value));
+    document.getElementById("langToggle").addEventListener("click", () => {
+      const newLang = savedLang === 'ar' ? 'en' : 'ar';
+      localStorage.setItem('language', newLang);
+      location.reload();
+    });
+    document.getElementById("currentYear").textContent = new Date().getFullYear();
+
+    updatePageTitle();
+    showLevelStatistics(filteredPrompts);
+    renderPrompts(filteredPrompts);
+  </script>
+</body>
+</html>
