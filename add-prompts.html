@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>إضافة مجموعة برومبتات - Promptica</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"  rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9fafb;
+      color: #1f2937;
+      line-height: 1.6;
+    }
+    .line-clamp-3 {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    @media (max-width: 640px) {
+      html { font-size: 16px; }
+    }
+    .banner {
+      max-height: 200px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .alert {
+      transition: opacity 0.3s ease;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 p-4 flex flex-col items-center">
+  <!-- Banner -->
+  <div class="mb-6 w-full">
+    <img src="Toolbar-add.png" alt="بانير" class="w-full h-auto rounded-lg shadow-md object-cover banner">
+  </div>
+
+  <!-- Modal Container -->
+  <div class="bg-white w-full max-w-3xl p-8 rounded-lg shadow-2xl">
+    <header class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">إضافة مجموعة برومبتات</h2>
+      <button onclick="window.close()" 
+        class="text-gray-500 hover:text-gray-700 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </header>
+
+    <form id="bulkAddForm" class="space-y-6 w-full">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="sm:col-span-2 lg:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2">القسم الرئيسي:</label>
+          <select id="mainCategory" 
+            class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required>
+            <option value="">اختر القسم الرئيسي...</option>
+          </select>
+        </div>
+        <div class="sm:col-span-2 lg:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2">القسم الفرعي:</label>
+          <select id="subCategory" 
+            class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required>
+            <option value="">اختر القسم الفرعي...</option>
+          </select>
+        </div>
+        <div class="sm:col-span-2 lg:col-span-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2">المستوى:</label>
+          <select id="level" 
+            class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required>
+            <option value="مبتدئ" class="text-yellow-600">🎓 مبتدئ</option>
+            <option value="متوسط" class="text-blue-600">🎯 متوسط</option>
+            <option value="محترف" class="text-purple-600">🏆 محترف</option>
+          </select>
+        </div>
+        <div class="sm:col-span-3">
+          <label class="block text-sm font-medium text-gray-700 mb-2">نص البرومبتات:</label>
+          <textarea 
+            id="promptsTextArea" 
+            rows="10"
+            placeholder="**عنوان البرومبت**  
+نص البرومبت...  
+**عنوان آخر**  
+نص آخر..."
+            class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required></textarea>
+          <p class="text-xs text-gray-500 mt-1">
+            <strong>التنسيق المطلوب:</strong>  
+            <br/>
+            استخدم <code>**عنوان البرومبت**</code> قبل كل نص على سطر منفصل.
+          </p>
+        </div>
+        <div class="sm:col-span-3 flex justify-end">
+          <button type="button" 
+            onclick="window.close()" 
+            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded mr-2 transition">
+            إلغاء
+          </button>
+          <button type="submit" 
+            class="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 
+            text-white font-semibold rounded shadow-md transition transform hover:scale-95">
+            ➕ إضافة البرومبتات
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Detailed Feedback -->
+    <div id="feedback" class="hidden mt-4 p-4 rounded-lg">
+      <div class="flex items-center space-x-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <span id="feedbackMessage"></span>
+      </div>
+    </div>
+
+  
+
+  <script>
+    // Load categories dynamically
+    const categories = JSON.parse(localStorage.getItem('categories')) || [];
+    const subCategories = JSON.parse(localStorage.getItem('subCategories')) || {};
+
+    // Initialize main category select
+    const mainCategorySelect = document.getElementById("mainCategory");
+    categories.forEach(cat => {
+      const option = document.createElement("option");
+      option.value = cat;
+      option.textContent = cat;
+      mainCategorySelect.appendChild(option);
+    });
+
+    // Handle subcategory updates
+    mainCategorySelect.addEventListener("change", () => {
+      const subSelect = document.getElementById("subCategory");
+      subSelect.innerHTML = '<option value="">اختر القسم الفرعي...</option>';
+      const selectedMain = mainCategorySelect.value;
+      if (selectedMain && subCategories[selectedMain]) {
+        subCategories[selectedMain].forEach(sub => {
+          const option = document.createElement("option");
+          option.value = sub;
+          option.textContent = sub;
+          subSelect.appendChild(option);
+        });
+      }
+    });
+
+    // Form submission handler
+    document.getElementById("bulkAddForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const mainCategory = mainCategorySelect.value;
+      const subCategory = document.getElementById("subCategory").value;
+      const level = document.getElementById("level").value;
+      const promptsText = document.getElementById("promptsTextArea").value.trim();
+
+      if (!mainCategory || !subCategory || !level || !promptsText) {
+        document.getElementById("feedbackMessage").innerHTML = "يرجى ملء جميع الحقول";
+        document.getElementById("feedback").className = "alert p-4 rounded-lg bg-red-500 text-white";
+        document.getElementById("feedback").style.display = "block";
+        return;
+      }
+
+      // Parse prompts using regex
+      const regex = /(\*\*.+?\*\*)\s*(\S[\s\S]*?(?=\*\*|\z))/g;
+      const matches = [...promptsText.matchAll(regex)];
+      const newPrompts = matches.map(match => ({
+        title: match[1].trim().replace(/^\*\*|\*\*$/g, ''),
+        content: match[2].trim()
+      }));
+
+      // Validate uniqueness
+      const existingPrompts = JSON.parse(localStorage.getItem('prompts')) || [];
+      const validPrompts = newPrompts.filter(p => 
+        !existingPrompts.some(existing => existing.text === p.content)
+      );
+      const duplicates = newPrompts.length - validPrompts.length;
+
+      // Save to localStorage
+      const updatedPrompts = [...existingPrompts, ...validPrompts.map(p => ({
+        id: generatePromptId(p.content),
+        text: p.content,
+        category: mainCategory,
+        subCategory: subCategory,
+        level: level,
+        tokens: calculateTokens(p.content),
+        createdAt: new Date().toISOString()
+      }))];
+
+      localStorage.setItem('prompts', JSON.stringify(updatedPrompts));
+
+      // Update categories if new
+      if (!categories.includes(mainCategory)) {
+        categories.push(mainCategory);
+        localStorage.setItem('categories', JSON.stringify(categories));
+      }
+
+      // Show feedback
+      document.getElementById("feedbackMessage").innerHTML = `
+        تم إضافة ${validPrompts.length} برومبتات جديدة  
+        (${duplicates} مكررة لم تُضاف)`;
+      document.getElementById("feedback").className = "alert p-4 rounded-lg bg-green-500 text-white";
+      document.getElementById("feedback").style.display = "block";
+
+      // Clear form after submission
+      document.getElementById("promptsTextArea").value = "";
+      mainCategorySelect.selectedIndex = 0;
+      document.getElementById("subCategory").selectedIndex = 0;
+    });
+
+    // Helper functions
+    function generatePromptId(text) {
+      let hash = 0;
+      for (let i = 0; i < text.length; i++) {
+        hash = (hash << 5) - hash + text.charCodeAt(i);
+      }
+      return `prompt_${Math.abs(hash).toString(16)}`;
+    }
+
+    function calculateTokens(text) {
+      return Math.ceil(text.split(/\s+/).length * 1.25);
+    }
+  </script>
+</body>
+</html>
