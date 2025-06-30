@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>نسخة احتياطية لبيانات مولد البرومبتات</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body { 
+      font-family: 'Tajawal', sans-serif;
+      background-color: #f9fafb; 
+      padding: 2rem;
+    }
+    .storage-section {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+    }
+    .storage-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #1f2937;
+    }
+    .storage-input {
+      width: 100%;
+      min-height: 200px;
+      padding: 1rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      margin-top: 1rem;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="text-3xl font-bold text-indigo-600 mb-4">نسخة احتياطية لبيانات مولد البرومبتات</h1>
+
+  <!-- أزرار التصدير والاستيراد -->
+  <div class="flex flex-col sm:flex-row gap-3 mb-6">
+    <button 
+      onclick="exportData()" 
+      class="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition duration-300"
+    >
+      <i class="fas fa-download"></i> تصدير جميع البيانات
+    </button>
+    <div class="flex items-center gap-3">
+      <input 
+        type="file" 
+        id="importFile" 
+        accept=".json" 
+        class="hidden" 
+        onchange="importFromFile(event)"
+      />
+      <button 
+        onclick="document.getElementById('importFile').click()" 
+        class="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition duration-300"
+      >
+        <i class="fas fa-upload"></i> استيراد بيانات
+      </button>
+    </div>
+    <button 
+      onclick="clearStorage()" 
+      class="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded transition duration-300"
+    >
+      <i class="fas fa-trash"></i> مسح الكل
+    </button>
+  </div>
+
+  <!-- الأقسام -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- مصطلحات -->
+    <div class="storage-section">
+      <h2 class="storage-title">المصطلحات</h2>
+      <textarea id="terms" class="storage-input" placeholder="[]"></textarea>
+      <button onclick="saveSection('terms')" class="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
+        <i class="fas fa-save"></i> حفظ المصطلحات
+      </button>
+    </div>
+
+    <!-- أدوات -->
+    <div class="storage-section">
+      <h2 class="storage-title">أدوات الذكاء الاصطناعي</h2>
+      <textarea id="tools" class="storage-input" placeholder="[]"></textarea>
+      <button onclick="saveSection('tools')" class="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
+        <i class="fas fa-save"></i> حفظ الأدوات
+      </button>
+    </div>
+
+    <!-- أوصاف البشر -->
+    <div class="storage-section">
+      <h2 class="storage-title">أوصاف البشر</h2>
+      <textarea id="humanAttributes" class="storage-input" placeholder="[]"></textarea>
+      <button onclick="saveSection('humanAttributes')" class="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
+        <i class="fas fa-save"></i> حفظ الأوصاف
+      </button>
+    </div>
+
+    <!-- أوصاف الحيوانات -->
+    <div class="storage-section">
+      <h2 class="storage-title">أوصاف الحيوانات</h2>
+      <textarea id="animalAttributes" class="storage-input" placeholder="[]"></textarea>
+      <button onclick="saveSection('animalAttributes')" class="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
+        <i class="fas fa-save"></i> حفظ الأوصاف
+      </button>
+    </div>
+
+    <!-- أوصاف الطبيعة -->
+    <div class="storage-section">
+      <h2 class="storage-title">أوصاف الطبيعة</h2>
+      <textarea id="natureAttributes" class="storage-input" placeholder="[]"></textarea>
+      <button onclick="saveSection('natureAttributes')" class="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
+        <i class="fas fa-save"></i> حفظ الأوصاف
+      </button>
+    </div>
+
+    <!-- أوصاف الآلات -->
+    <div class="storage-section">
+      <h2 class="storage-title">أوصاف الآلات</h2>
+      <textarea id="machineAttributes" class="storage-input" placeholder="[]"></textarea>
+      <button onclick="saveSection('machineAttributes')" class="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
+        <i class="fas fa-save"></i> حفظ الأوصاف
+      </button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <script>
+    // تحميل البيانات عند فتح الصفحة
+    function loadStorageData() {
+      try {
+        document.getElementById('terms').value = 
+          localStorage.getItem('terms') ? JSON.stringify(JSON.parse(localStorage.getItem('terms')), null, 2) : '[]';
+        
+        document.getElementById('tools').value = 
+          localStorage.getItem('tools') ? JSON.stringify(JSON.parse(localStorage.getItem('tools')), null, 2) : '[]';
+        
+        document.getElementById('humanAttributes').value = 
+          localStorage.getItem('humanAttributes') ? JSON.stringify(JSON.parse(localStorage.getItem('humanAttributes')), null, 2) : '[]';
+        
+        document.getElementById('animalAttributes').value = 
+          localStorage.getItem('animalAttributes') ? JSON.stringify(JSON.parse(localStorage.getItem('animalAttributes')), null, 2) : '[]';
+        
+        document.getElementById('natureAttributes').value = 
+          localStorage.getItem('natureAttributes') ? JSON.stringify(JSON.parse(localStorage.getItem('natureAttributes')), null, 2) : '[]';
+        
+        document.getElementById('machineAttributes').value = 
+          localStorage.getItem('machineAttributes') ? JSON.stringify(JSON.parse(localStorage.getItem('machineAttributes')), null, 2) : '[]';
+      } catch (e) {
+        console.error("Error loading data:", e);
+      }
+    }
+
+    // حفظ قسم معين
+    function saveSection(sectionId) {
+      try {
+        const value = JSON.parse(document.getElementById(sectionId).value);
+        localStorage.setItem(sectionId, JSON.stringify(value));
+        alert(`تم حفظ ${sectionId} بنجاح!`);
+      } catch (e) {
+        alert(`خطأ في حفظ ${sectionId}: ${e.message}`);
+      }
+    }
+
+    // تصدير جميع البيانات
+    function exportData() {
+      const data = {
+        terms: JSON.parse(localStorage.getItem('terms') || []),
+        tools: JSON.parse(localStorage.getItem('tools') || []),
+        humanAttributes: JSON.parse(localStorage.getItem('humanAttributes') || []),
+        animalAttributes: JSON.parse(localStorage.getItem('animalAttributes') || []),
+        natureAttributes: JSON.parse(localStorage.getItem('natureAttributes') || []),
+        machineAttributes: JSON.parse(localStorage.getItem('machineAttributes') || [])
+      };
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `prompt_generator_backup_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // استيراد البيانات
+    function importFromFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          
+          if (data.terms) localStorage.setItem('terms', JSON.stringify(data.terms));
+          if (data.tools) localStorage.setItem('tools', JSON.stringify(data.tools));
+          if (data.humanAttributes) localStorage.setItem('humanAttributes', JSON.stringify(data.humanAttributes));
+          if (data.animalAttributes) localStorage.setItem('animalAttributes', JSON.stringify(data.animalAttributes));
+          if (data.natureAttributes) localStorage.setItem('natureAttributes', JSON.stringify(data.natureAttributes));
+          if (data.machineAttributes) localStorage.setItem('machineAttributes', JSON.stringify(data.machineAttributes));
+          
+          loadStorageData();
+          alert('تم استيراد البيانات بنجاح!');
+        } catch (e) {
+          alert(`خطأ في استيراد البيانات: ${e.message}`);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // مسح جميع البيانات
+    function clearStorage() {
+      if (confirm('هل أنت متأكد من مسح جميع البيانات؟ لا يمكن التراجع عن هذا الإجراء!')) {
+        localStorage.removeItem('terms');
+        localStorage.removeItem('tools');
+        localStorage.removeItem('humanAttributes');
+        localStorage.removeItem('animalAttributes');
+        localStorage.removeItem('natureAttributes');
+        localStorage.removeItem('machineAttributes');
+        loadStorageData();
+        alert('تم مسح جميع البيانات بنجاح.');
+      }
+    }
+
+    // تحميل البيانات عند البدء
+    window.addEventListener('DOMContentLoaded', loadStorageData);
+  </script>
+</body>
+</html>
