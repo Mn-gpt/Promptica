@@ -1,0 +1,2 @@
+# Promptica
+prompts-ar
