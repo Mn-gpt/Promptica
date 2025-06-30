@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة التعليقات - نظام التعليقات</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f9fafb;
+        }
+        .comment-card {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            background: linear-gradient(to bottom right, #ffffff, #f8fafc);
+        }
+        .comment-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .reply-card {
+            background-color: rgba(59, 130, 246, 0.05);
+            border-left: 3px solid #3b82f6;
+            border-radius: 8px;
+        }
+        .empty-state {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%);
+            border-radius: 12px;
+        }
+        .system-card {
+            background: linear-gradient(to right, #e0f2fe, #dbeafe);
+            border-radius: 12px;
+        }
+        .header-gradient {
+            background: linear-gradient(to right, #1d4ed8, #3b82f6);
+        }
+        .skeleton-loader {
+            animation: pulse 2s infinite;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <h1 class="text-3xl font-bold text-white bg-blue-600 px-6 py-3 rounded-lg header-gradient shadow-lg">نظام التعليقات</h1>
+                <a href="index.html" class="px-5 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition duration-300 flex items-center mt-4 md:mt-0 shadow-md hover:shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+         العودة للصفحة الرئيسية 
+                </a>
+            </div>
+        </header>
+
+        <main>
+            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-6">
+                    <div class="flex flex-col md:flex-row justify-between items-center">
+                        <h1 class="text-2xl md:text-3xl font-bold text-white">إدارة التعليقات</h1>
+                        <div class="mt-4 md:mt-0 flex space-x-3">
+                            <button onclick="clearAllComments()" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition duration-300 text-sm flex items-center shadow-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                                حذف الكل
+                            </button>
+                            <button onclick="reloadComments()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition duration-300 text-sm flex items-center shadow-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                                </svg>
+                                تحديث
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <div class="system-card p-4 rounded-lg mb-6">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <h3 class="font-bold text-blue-800 text-lg">معلومات النظام</h3>
+                        </div>
+                        <div class="mt-3">
+                            <p class="text-blue-700" id="debugInfo">جاري تحميل التعليقات...</p>
+                            <div class="mt-3 flex flex-wrap gap-2" id="commentStats"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="commentsContainer">
+                        <!-- Loading skeleton -->
+                        <div class="space-y-6" id="skeletonLoader">
+                            <div class="border rounded-lg p-5 bg-white">
+                                <div class="flex justify-between items-center mb-4">
+                                    <div>
+                                        <div class="skeleton-loader h-6 w-48 mb-2"></div>
+                                        <div class="skeleton-loader h-4 w-32"></div>
+                                    </div>
+                                    <div class="skeleton-loader h-5 w-20"></div>
+                                </div>
+                                <div class="skeleton-loader h-5 w-full mb-3"></div>
+                                <div class="skeleton-loader h-5 w-3/4 mb-6"></div>
+                                <div class="flex space-x-3">
+                                    <div class="skeleton-loader h-4 w-16"></div>
+                                </div>
+                                <div class="mt-6">
+                                    <div class="skeleton-loader h-5 w-24 mb-3"></div>
+                                    <div class="skeleton-loader h-16 w-full"></div>
+                                    <div class="skeleton-loader h-8 w-24 mt-2"></div>
+                                </div>
+                            </div>
+                            <div class="border rounded-lg p-5 bg-white">
+                                <div class="flex justify-between items-center mb-4">
+                                    <div>
+                                        <div class="skeleton-loader h-6 w-48 mb-2"></div>
+                                        <div class="skeleton-loader h-4 w-32"></div>
+                                    </div>
+                                    <div class="skeleton-loader h-5 w-20"></div>
+                                </div>
+                                <div class="skeleton-loader h-5 w-full mb-3"></div>
+                                <div class="skeleton-loader h-5 w-3/4 mb-6"></div>
+                                <div class="flex space-x-3">
+                                    <div class="skeleton-loader h-4 w-16"></div>
+                                </div>
+                                <div class="mt-6">
+                                    <div class="skeleton-loader h-5 w-24 mb-3"></div>
+                                    <div class="skeleton-loader h-16 w-full"></div>
+                                    <div class="skeleton-loader h-8 w-24 mt-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-12 py-6 bg-white rounded-t-lg shadow-inner">
+            <div class="text-center text-gray-600">
+                <p>© <span id="currentYear"></span> نظام التعليقات | جميع الحقوق محفوظة</p>
+                <p class="mt-2 text-sm">تم تصميم هذه الصفحة باستخدام HTML وCSS وJavaScript</p>
+            </div>
+        </footer>
+        
+        <div class="fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg" id="statusMessage">
+            جاري تحميل التعليقات...
+        </div>
+    </div>
+
+    <script>
+        // Current year for footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
+        // DOM Elements
+        const commentsContainer = document.getElementById('commentsContainer');
+        const statusMessage = document.getElementById('statusMessage');
+        
+        // Debugging functions
+        function showStatus(message, isError = false) {
+            statusMessage.textContent = message;
+            statusMessage.className = isError 
+                ? 'fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg'
+                : 'fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg';
+            
+            setTimeout(() => {
+                statusMessage.style.opacity = '0';
+                setTimeout(() => {
+                    statusMessage.style.opacity = '1';
+                }, 3000);
+            }, 3000);
+        }
+        
+        function updateDebugInfo(message) {
+            document.getElementById('debugInfo').textContent = message;
+        }
+        
+        function updateCommentStats(comments) {
+            const commentStats = document.getElementById('commentStats');
+            const totalComments = comments.length;
+            const totalReplies = comments.reduce((acc, comment) => acc + (comment.replies?.length || 0), 0);
+            const lastUpdate = new Date().toLocaleTimeString('ar-EG');
+            
+            commentStats.innerHTML = `
+                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">${totalComments} تعليق</span>
+                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">${totalReplies} رد</span>
+                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">آخر تحديث: ${lastUpdate}</span>
+            `;
+        }
+
+        // Load comments from localStorage
+        function loadComments() {
+            showStatus('جاري تحميل التعليقات من التخزين المحلي...');
+            
+            try {
+                const commentsData = localStorage.getItem('comments');
+                
+                if (!commentsData) {
+                    showStatus('لا توجد تعليقات في التخزين المحلي');
+                    return [];
+                }
+                
+                const comments = JSON.parse(commentsData);
+                showStatus(`تم تحميل ${comments.length} تعليقاً بنجاح`);
+                return comments;
+            } catch (e) {
+                showStatus(`خطأ في تحميل التعليقات: ${e.message}`, true);
+                return [];
+            }
+        }
+
+        // Clear all comments
+        function clearAllComments() {
+            if (confirm('هل أنت متأكد من حذف جميع التعليقات؟ لا يمكن التراجع عن هذا الإجراء.')) {
+                localStorage.removeItem('comments');
+                showStatus('تم حذف جميع التعليقات بنجاح');
+                renderComments();
+            }
+        }
+        
+        // Reload comments
+        function reloadComments() {
+            showStatus('جاري تحديث قائمة التعليقات...');
+            renderComments();
+        }
+
+        // Render Comments
+        function renderComments() {
+            const comments = loadComments();
+            updateDebugInfo(`تم تحميل ${comments.length} تعليقاً`);
+            updateCommentStats(comments);
+            
+            const skeletonLoader = document.getElementById('skeletonLoader');
+            if (skeletonLoader) {
+                skeletonLoader.style.display = 'none';
+            }
+            
+            if (comments.length === 0) {
+                commentsContainer.innerHTML = `
+                    <div class="text-center py-12 bg-blue-50 rounded-lg empty-state">
+                        <svg class="mx-auto h-16 w-16 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                        </svg>
+                        <h3 class="mt-4 text-xl font-medium text-gray-900">لا توجد تعليقات بعد</h3>
+                        <p class="mt-2 text-gray-600 max-w-md mx-auto">لم يتم إضافة أي تعليقات حتى الآن. يمكنك البدء بإضافة تعليق جديد.</p>
+                        <div class="mt-6">
+                            <a href="add-comments.html" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
+                                <svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                إضافة تعليق جديد
+                            </a>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            comments.forEach(comment => {
+                // التحقق من وجود بيانات التعليق
+                const hasName = comment.name && comment.name.trim() !== '';
+                const hasEmail = comment.email && comment.email.trim() !== '';
+                const hasType = comment.type && comment.type.trim() !== '';
+                const hasText = comment.text && comment.text.trim() !== '';
+                const hasReplies = comment.replies && Array.isArray(comment.replies) && comment.replies.length > 0;
+                
+                html += `
+                    <div class="border rounded-lg p-5 bg-white mb-6 comment-card fade-in">
+                        <div class="flex flex-col md:flex-row justify-between items-start mb-4">
+                            <div class="mb-2 md:mb-0">
+                                <h3 class="font-bold text-lg text-gray-800">${hasName ? comment.name : 'مستخدم غير معروف'}</h3>
+                                <p class="text-sm text-gray-600">${hasEmail ? comment.email : 'بريد غير متوفر'}</p>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-2">
+                                    ${hasType ? comment.type : 'نوع غير محدد'}
+                                </span>
+                                <span class="text-xs text-gray-500">
+                                    ${new Date(comment.id).toLocaleString('ar-EG')}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <p class="mt-3 text-gray-700">${hasText ? comment.text : 'لا يوجد نص للتعليق'}</p>
+                        
+                        <div class="mt-4 flex space-x-3">
+                            <button onclick="deleteComment(${comment.id})" class="text-red-600 hover:text-red-800 text-sm font-medium flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                                حذف التعليق
+                            </button>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h4 class="font-semibold text-gray-700 mb-3">الردود:</h4>
+                `;
+                
+                if (hasReplies) {
+                    html += '<div class="space-y-3">';
+                    comment.replies.forEach(reply => {
+                        const hasReplyName = reply.name && reply.name.trim() !== '';
+                        const hasReplyText = reply.text && reply.text.trim() !== '';
+                        
+                        html += `
+                            <div class="bg-white p-3 rounded-lg shadow-sm reply-card fade-in">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <strong class="text-gray-800">${hasReplyName ? reply.name : 'مشرف'}</strong>
+                                        <span class="text-xs text-gray-500 ml-2">المشرف</span>
+                                    </div>
+                                    <span class="text-xs text-gray-500">
+                                        ${new Date(reply.id).toLocaleString('ar-EG')}
+                                    </span>
+                                </div>
+                                <p class="mt-1 text-gray-700">${hasReplyText ? reply.text : 'لا يوجد نص للرد'}</p>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                } else {
+                    html += '<p class="text-gray-500 italic">لا توجد ردود على هذا التعليق</p>';
+                }
+                
+                html += `
+                            <div class="mt-4">
+                                <textarea id="reply-${comment.id}" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="اكتب ردك هنا..."></textarea>
+                                <button onclick="addReply(${comment.id})" class="mt-2 px-4 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 text-sm flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                    إرسال الرد
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            commentsContainer.innerHTML = html;
+            showStatus(`تم عرض ${comments.length} تعليقاً بنجاح`);
+        }
+
+        // Add Reply
+        function addReply(commentId) {
+            const replyText = document.getElementById(`reply-${commentId}`).value.trim();
+            if (!replyText) {
+                showStatus('يرجى كتابة نص الرد قبل الإرسال', true);
+                return;
+            }
+            
+            let comments = loadComments();
+            const commentIndex = comments.findIndex(c => c.id === commentId);
+            
+            if (commentIndex !== -1) {
+                if (!comments[commentIndex].replies) {
+                    comments[commentIndex].replies = [];
+                }
+                
+                comments[commentIndex].replies.push({
+                    id: Date.now(),
+                    name: 'المشرف',
+                    text: replyText
+                });
+                
+                localStorage.setItem('comments', JSON.stringify(comments));
+                document.getElementById(`reply-${commentId}`).value = '';
+                renderComments();
+                showStatus('تم إرسال الرد بنجاح!');
+            } else {
+                showStatus('لم يتم العثور على التعليق للإضافة الرد', true);
+            }
+        }
+
+        // Delete Comment
+        function deleteComment(commentId) {
+            if (confirm('هل أنت متأكد من حذف هذا التعليق؟')) {
+                let comments = loadComments();
+                const initialCount = comments.length;
+                comments = comments.filter(comment => comment.id !== commentId);
+                
+                if (comments.length < initialCount) {
+                    localStorage.setItem('comments', JSON.stringify(comments));
+                    renderComments();
+                    showStatus('تم حذف التعليق بنجاح!');
+                } else {
+                    showStatus('لم يتم العثور على التعليق لحذفه', true);
+                }
+            }
+        }
+
+        // Initialize
+        setTimeout(() => {
+            renderComments();
+        }, 1000);
+    </script>
+</body>
+</html>
