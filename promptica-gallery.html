@@ -514,6 +514,9 @@
     </style>
 </head>
 <body>
+	<div class="mb-6 rounded-2xl overflow-hidden shadow-xl">
+    <img src="Toolbar-My.png" alt="بانير موقع Promptica" class="w-full h-auto object-cover max-h-56 md:max-h-64">
+  </div>
     <div class="header">
         <div class="logo">
             <i class="fas fa-magic"></i>
@@ -587,9 +590,9 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="promptModel">الإدارة المستخدمة</label>
+                    <label for="promptModel">الاداة المستخدمة </label>
                     <select id="promptModel" class="form-control" required>
-                        <option value="">اختر الإدارة...</option>
+                        <option value="">أختر الأداة...</option>
                         <option>ChatGPT (DALL-E 3)</option>
                         <option>DALL-E 3</option>
                         <option>Midjourney</option>
@@ -751,7 +754,7 @@
                             </div>
                             <div style="background: rgba(15, 23, 42, 0.7); padding: 20px; border-radius: 12px;">
                                 <p style="color: #94a3b8; font-size: 18px; line-height: 1.6; margin-bottom: 15px;">${promptText}</p>
-                                <p style="color: #64748b; font-size: 14px;"><strong>الإدارة:</strong> ${model}</p>
+                                <p style="color: #64748b; font-size: 14px;"><strong>الاداة:</strong> ${model}</p>
                                 <button class="copy-btn" style="margin-top: 20px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
                                     <i class="fas fa-copy"></i> نسخ البرومبت
                                 </button>
