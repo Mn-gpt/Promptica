@@ -67,6 +67,17 @@
             gap: 10px;
             overflow-x: auto;
             padding: 5px 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+
+        .filters::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .filters::-webkit-scrollbar-thumb {
+            background-color: var(--primary);
+            border-radius: 3px;
         }
 
         .filter-btn {
@@ -209,11 +220,19 @@
             justify-content: center;
             z-index: 100;
             transition: var(--transition);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
         }
 
         .add-btn:hover {
             background: var(--secondary);
             transform: scale(1.1) rotate(90deg);
+            animation: none;
         }
 
         /* تفاعلات النسخ */
@@ -267,6 +286,8 @@
             transform: translateY(20px);
             transition: transform 0.4s ease;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .add-modal.active .modal-content {
@@ -348,6 +369,48 @@
             background: var(--secondary);
         }
 
+        .file-upload {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .file-btn {
+            background: rgba(99, 102, 241, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .file-btn:hover {
+            background: var(--primary);
+        }
+
+        .file-name {
+            color: #94a3b8;
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+        }
+
+        .image-preview {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 12px;
+            display: none;
+        }
+
         /* التكيف مع الموبايل */
         @media (max-width: 768px) {
             .gallery {
@@ -383,6 +446,40 @@
             .card h3 {
                 font-size: 18px;
             }
+            
+            .filters {
+                padding: 5px 0 15px;
+            }
+            
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+        }
+
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        .scroll-top-btn.visible {
+            opacity: 1;
+            pointer-events: all;
         }
     </style>
 </head>
@@ -412,6 +509,10 @@
         <i class="fas fa-plus"></i>
     </button>
     
+    <button class="scroll-top-btn" id="scrollTopBtn">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    
     <div class="copied-message" id="copiedMessage">تم نسخ البرومبت!</div>
     
     <!-- نافذة إضافة برومبت جديد -->
@@ -435,12 +536,24 @@
                 <div class="form-group">
                     <label for="promptImage">رابط الصورة/الفيديو</label>
                     <input type="url" id="promptImage" class="form-control" placeholder="https://example.com/image.jpg" required>
+                    
+                    <div class="file-upload">
+                        <input type="file" id="fileUpload" accept="image/*" style="display: none;">
+                        <button type="button" class="file-btn" id="uploadBtn">
+                            <i class="fas fa-upload"></i> اختر صورة من الجهاز
+                        </button>
+                        <span class="file-name" id="fileName">لم يتم اختيار ملف</span>
+                    </div>
+                    
+                    <div class="image-preview">
+                        <img src="" alt="معاينة الصورة" class="preview-img" id="imagePreview">
+                    </div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="promptModel">الأداة المستخدمة</label>
+                    <label for="promptModel">الإدارة المستخدمة</label>
                     <select id="promptModel" class="form-control" required>
-                        <option value="">ااختر الأداة...</option>
+                        <option value="">اختر الإدارة...</option>
                         <option>DALL-E 3</option>
                         <option>Midjourney</option>
                         <option>Stable Diffusion</option>
@@ -516,6 +629,12 @@
         const closeModal = document.getElementById('closeModal');
         const addForm = document.getElementById('addForm');
         const searchInput = document.getElementById('searchInput');
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileUpload = document.getElementById('fileUpload');
+        const fileName = document.getElementById('fileName');
+        const imagePreview = document.getElementById('imagePreview');
+        const promptImage = document.getElementById('promptImage');
         
         // إنشاء بطاقات المعرض
         function renderGallery(promptsArray) {
@@ -559,11 +678,61 @@
                     navigator.clipboard.writeText(promptText);
                     
                     const message = document.getElementById('copiedMessage');
+                    message.textContent = 'تم نسخ البرومبت بنجاح!';
                     message.classList.add('copied-show');
                     
                     setTimeout(() => {
                         message.classList.remove('copied-show');
                     }, 2000);
+                });
+            });
+            
+            // إضافة مستمعي الأحداث للعرض الموسع
+            document.querySelectorAll('.expand-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const card = e.target.closest('.card');
+                    const img = card.querySelector('img');
+                    const title = card.querySelector('h3').textContent;
+                    const promptText = card.querySelector('.prompt-text').textContent;
+                    
+                    const modal = document.createElement('div');
+                    modal.className = 'add-modal active';
+                    modal.innerHTML = `
+                        <div class="modal-content" style="max-width: 90%;">
+                            <div class="modal-header">
+                                <h2>${title}</h2>
+                                <button class="close-btn">&times;</button>
+                            </div>
+                            <div style="text-align: center; margin: 20px 0;">
+                                <img src="${img.src}" alt="${title}" style="max-width: 100%; max-height: 60vh; border-radius: 12px;">
+                            </div>
+                            <div style="background: rgba(15, 23, 42, 0.7); padding: 20px; border-radius: 12px;">
+                                <p style="color: #94a3b8; font-size: 18px; line-height: 1.6;">${promptText}</p>
+                                <button class="copy-btn" style="margin-top: 20px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                                    <i class="fas fa-copy"></i> نسخ البرومبت
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(modal);
+                    
+                    // إغلاق النافذة
+                    modal.querySelector('.close-btn').addEventListener('click', () => {
+                        modal.remove();
+                    });
+                    
+                    // نسخ البرومبت
+                    modal.querySelector('.copy-btn').addEventListener('click', () => {
+                        navigator.clipboard.writeText(promptText);
+                        const message = document.getElementById('copiedMessage');
+                        message.textContent = 'تم نسخ البرومبت بنجاح!';
+                        message.classList.add('copied-show');
+                        
+                        setTimeout(() => {
+                            message.classList.remove('copied-show');
+                        }, 2000);
+                    });
                 });
             });
         }
@@ -574,13 +743,14 @@
         // فتح نافذة الإضافة
         addButton.addEventListener('click', () => {
             addModal.classList.add('active');
-            document.body.style.overflow = 'hidden'; // منع التمرير عند فتح النافذة
+            document.body.style.overflow = 'hidden';
         });
         
         // إغلاق نافذة الإضافة
         closeModal.addEventListener('click', () => {
             addModal.classList.remove('active');
             document.body.style.overflow = 'auto';
+            resetFileUpload();
         });
         
         // إغلاق النافذة عند النقر خارجها
@@ -588,6 +758,7 @@
             if (e.target === addModal) {
                 addModal.classList.remove('active');
                 document.body.style.overflow = 'auto';
+                resetFileUpload();
             }
         });
         
@@ -595,11 +766,20 @@
         addForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
+            // الحصول على رابط الصورة أو الصورة المرفوعة
+            let imageUrl = promptImage.value;
+            
+            if (fileUpload.files.length > 0) {
+                // في حالة الإنتاج الحقيقي، هنا سيتم رفع الصورة إلى الخادم
+                // لكننا في هذا المثال سنستخدم معاينة فقط
+                imageUrl = URL.createObjectURL(fileUpload.files[0]);
+            }
+            
             const newPrompt = {
                 id: prompts.length + 1,
                 title: document.getElementById('promptTitle').value,
                 text: document.getElementById('promptText').value,
-                image: document.getElementById('promptImage').value,
+                image: imageUrl,
                 model: document.getElementById('promptModel').value,
                 category: document.getElementById('promptCategory').value,
                 date: new Date().toLocaleDateString('ar-EG', {
@@ -619,6 +799,7 @@
             addModal.classList.remove('active');
             document.body.style.overflow = 'auto';
             addForm.reset();
+            resetFileUpload();
             
             // إظهار رسالة نجاح
             const message = document.getElementById('copiedMessage');
@@ -627,7 +808,6 @@
             
             setTimeout(() => {
                 message.classList.remove('copied-show');
-                message.textContent = 'تم نسخ البرومبت!';
             }, 3000);
         });
         
@@ -656,9 +836,68 @@
             const searchTerm = searchInput.value.toLowerCase();
             const filteredPrompts = prompts.filter(prompt => 
                 prompt.title.toLowerCase().includes(searchTerm) || 
-                prompt.text.toLowerCase().includes(searchTerm)
+                prompt.text.toLowerCase().includes(searchTerm) ||
+                prompt.model.toLowerCase().includes(searchTerm) ||
+                (prompt.category && prompt.category.toLowerCase().includes(searchTerm))
             );
             renderGallery(filteredPrompts);
+        });
+        
+        // زر العودة للأعلى
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollTopBtn.classList.add('visible');
+            } else {
+                scrollTopBtn.classList.remove('visible');
+            }
+        });
+        
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // إدارة تحميل الملفات
+        uploadBtn.addEventListener('click', () => {
+            fileUpload.click();
+        });
+        
+        fileUpload.addEventListener('change', () => {
+            if (fileUpload.files.length > 0) {
+                const file = fileUpload.files[0];
+                fileName.textContent = file.name;
+                
+                // عرض معاينة الصورة
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+                
+                // تعطيل حقل رابط الصورة
+                promptImage.disabled = true;
+                promptImage.placeholder = "تم اختيار صورة من الجهاز";
+            } else {
+                resetFileUpload();
+            }
+        });
+        
+        function resetFileUpload() {
+            fileUpload.value = '';
+            fileName.textContent = 'لم يتم اختيار ملف';
+            imagePreview.style.display = 'none';
+            promptImage.disabled = false;
+            promptImage.placeholder = "https://example.com/image.jpg";
+        }
+        
+        // إعادة تعيين حقل رابط الصورة عند التغيير
+        promptImage.addEventListener('input', () => {
+            if (promptImage.value) {
+                resetFileUpload();
+            }
         });
     </script>
 </body>
