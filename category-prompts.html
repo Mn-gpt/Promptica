@@ -76,49 +76,7 @@
     </div>
   </section>
   
-   <!-- Feedback Modal -->
-  <div id="feedbackModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
-    <div class="bg-white w-full max-w-md p-6 rounded-lg shadow-lg relative">
-      <h3 class="text-xl font-bold mb-4">إضافة تعليق</h3>
-      <button 
-        onclick="document.getElementById('feedbackModal').classList.add('hidden')"
-        class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
 
-      <form id="feedbackForm" class="space-y-4 mt-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700">اسمك (اختياري)</label>
-          <input type="text" name="name" placeholder="أدخل اسمك..." class="w-full border border-gray-300 p-2 rounded"/>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">بريدك الإلكتروني (اختياري)</label>
-          <input type="email" name="email" placeholder="example@email.com" class="w-full border border-gray-300 p-2 rounded"/>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">نوع التعليق</label>
-          <select name="type" class="w-full border border-gray-300 p-2 rounded">
-            <option value="suggestion">اقتراح تحسين</option>
-            <option value="bug">ابلاغ عن خطأ</option>
-            <option value="design">ملاحظات على التصميم</option>
-            <option value="translation">ملاحظات على الترجمة</option>
-            <option value="other">أخرى</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">محتوى التعليق</label>
-          <textarea name="message" rows="4" placeholder="اكتب تعليقك هنا..." class="w-full border border-gray-300 p-2 rounded"></textarea>
-        </div>
-        <div class="flex justify-end space-x-2">
-          <button 
-            type="button" 
-            onclick="document.getElementById('feedbackModal').classList.add('hidden')" 
-            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded">إلغاء</button>
-          <button 
-            type="submit" 
-            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded">إرسال</button>
-        </div>
-      </form>
-    </div>
-  </div>
 
 
   <!-- Level Statistics Cards -->
@@ -141,7 +99,8 @@
   <section class="mb-6 max-w-4xl mx-auto">
     <div class="text-center">
       <button 
-        onclick="document.getElementById('feedbackModal').classList.remove('hidden')"
+        onclick="window.open('add-comments.html', '_blank')"
+        onclick="add-comments.html"
         class="px-4 py-2 bg-green-100 text-green-700 hover:bg-green-200 rounded-full transition"
       >
         💬 إضافة تعليق
