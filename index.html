@@ -212,11 +212,110 @@
         English
       </button>
 
-      <div class="card-footer" style="background-color: #ffffff; padding: 20px;">
-        <button class="card-button" style="background: linear-gradient(90deg, #6363ff, #2ecc71); padding: 10px 25px; font-weight: bold;">
-                <a href="my-prompt.html" class="btn">اصنعه بنفسك</a>
-        </button>
-    </div>
+<!-- HTML -->
+
+<nav class="custom-menu">
+    <ul class="menu" style="
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        gap: 5px;
+        width: 150px;
+    ">
+                
+        <li style="
+            padding: 10px 20px;
+            background: #6a81c4;
+            color: #ffffff;
+            border-radius: 5px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        ">
+   <a href="my-prompt.html" class="btn"> انشاء</a>
+                    
+        </li>
+                    
+        <li style="
+            padding: 10px 20px;
+            background: #6a81c4;
+            color: #ffffff;
+            border-radius: 5px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        ">
+<a href="promptica-gallery.html" class="btn">المعرض</a>
+                    
+            <ul class="submenu" style="
+                position: absolute;
+                top: 100%;
+                left: 0;
+                background: #6a81c4;
+                list-style: none;
+                padding: 10px;
+                width: 200px;
+                border-radius: 5px;
+                display: none;
+                z-index: 100;
+            ">
+                        
+             
+        <li style="
+            padding: 10px 20px;
+            background: #6a81c4;
+            color: #ffffff;
+            border-radius: 5px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        ">
+            الخدمات
+                    
+        </li>
+                    
+    </ul>
+</nav>
+                
+
+<!-- CSS -->
+<style>
+
+.custom-menu .menu li {
+    position: relative;
+}
+
+.custom-menu .menu li:hover {
+    background: #3498db !important;
+    color: #ffffff !important;
+}
+
+.custom-menu .menu li:hover > .submenu {
+    display: block;
+}
+
+.custom-menu .submenu li {
+    height: auto;
+}
+
+.custom-menu .submenu li:hover {
+    background: #3498db !important;
+    color: #ffffff !important;
+}
+                
+</style>
+
+    
   <!-- Root Div for React App -->
   <div id="root"></div>
   <!-- Footer -->
