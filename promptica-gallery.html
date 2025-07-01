@@ -40,6 +40,26 @@
             padding: 10px;
         }
 
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo i {
+            color: var(--accent);
+            font-size: 32px;
+        }
+
         .search-bar {
             display: flex;
             background: rgba(255, 255, 255, 0.1);
@@ -481,10 +501,25 @@
             opacity: 1;
             pointer-events: all;
         }
+        
+        .chatgpt-tag {
+            background: linear-gradient(90deg, #74aa9c, #4a9b93);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 5px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <div class="header">
+        <div class="logo">
+            <i class="fas fa-magic"></i>
+            <h1>معرض برومبتات Promptica</h1>
+        </div>
+        
         <div class="search-bar">
             <i class="fas fa-search" style="color: #94a3b8; margin-left: 10px;"></i>
             <input type="text" id="searchInput" placeholder="ابحث عن برومبت...">
@@ -492,6 +527,7 @@
         
         <div class="filters">
             <button class="filter-btn active">الكل</button>
+            <button class="filter-btn">ChatGPT <span class="chatgpt-tag">DALL-E</span></button>
             <button class="filter-btn">DALL-E 3</button>
             <button class="filter-btn">Midjourney</button>
             <button class="filter-btn">Stable Diffusion</button>
@@ -554,11 +590,14 @@
                     <label for="promptModel">الإدارة المستخدمة</label>
                     <select id="promptModel" class="form-control" required>
                         <option value="">اختر الإدارة...</option>
+                        <option>ChatGPT (DALL-E 3)</option>
                         <option>DALL-E 3</option>
                         <option>Midjourney</option>
                         <option>Stable Diffusion</option>
+                        <option>Adobe Firefly</option>
                         <option>Kandinsky</option>
-                        <option>DeepSeek</option>
+                        <option>Leonardo AI</option>
+                        <option>Playground AI</option>
                         <option>أخرى</option>
                     </select>
                 </div>
@@ -573,6 +612,9 @@
                         <option>واقعية</option>
                         <option>سريالية</option>
                         <option>تصميم جرافيك</option>
+                        <option>شخصيات</option>
+                        <option>مناظر طبيعية</option>
+                        <option>خيال علمي</option>
                     </select>
                 </div>
                 
@@ -606,7 +648,7 @@
                 id: 3,
                 title: "بطل خارق في المدينة",
                 text: "رسم أنمي ملون لفتاة خارقة تقف على سطح ناطحة سحاب في مدينة طوكيو ليلاً، شعر أرجواني طويل، ملابس سوداء ووردية متوهجة، منظر خلفي مفصل للمدينة",
-                model: "Stable Diffusion XL",
+                model: "ChatGPT (DALL-E 3)",
                 date: "٢٨ يونيو ٢٠٢٥",
                 image: "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=600&w=800",
                 category: "أنيمي"
@@ -615,7 +657,7 @@
                 id: 4,
                 title: "غابة سحرية مضيئة",
                 text: "غابة خيالية ليلاً مع نباتات متوهجة، فطر ضوئي، أضواء خضراء وزرقاء عائمة، جو سحري وغامض، إضاءة درامية، دقة 4k",
-                model: "Midjourney v5",
+                model: "ChatGPT (DALL-E 3)",
                 date: "٢٧ يونيو ٢٠٢٥",
                 image: "https://images.unsplash.com/photo-1476820865390-c52aeebb9891?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=600&w=800",
                 category: "سريالية"
@@ -694,6 +736,7 @@
                     const img = card.querySelector('img');
                     const title = card.querySelector('h3').textContent;
                     const promptText = card.querySelector('.prompt-text').textContent;
+                    const model = card.querySelector('.badge').textContent;
                     
                     const modal = document.createElement('div');
                     modal.className = 'add-modal active';
@@ -707,7 +750,8 @@
                                 <img src="${img.src}" alt="${title}" style="max-width: 100%; max-height: 60vh; border-radius: 12px;">
                             </div>
                             <div style="background: rgba(15, 23, 42, 0.7); padding: 20px; border-radius: 12px;">
-                                <p style="color: #94a3b8; font-size: 18px; line-height: 1.6;">${promptText}</p>
+                                <p style="color: #94a3b8; font-size: 18px; line-height: 1.6; margin-bottom: 15px;">${promptText}</p>
+                                <p style="color: #64748b; font-size: 14px;"><strong>الإدارة:</strong> ${model}</p>
                                 <button class="copy-btn" style="margin-top: 20px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
                                     <i class="fas fa-copy"></i> نسخ البرومبت
                                 </button>
