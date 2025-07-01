@@ -3,882 +3,780 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مولد برومبتات الذكاء الاصطناعي</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>Promptica - منشئ البرومبتات المتقدم</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        .toggle-switch .slider:after {
-            content: "";
-            position: absolute;
-            background-color: white;
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: all 0.3s;
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --card-radius: 16px;
+            --transition: all 0.3s ease;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
-        .toggle-switch input:checked + .slider:after {
-            transform: translateX(24px);
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
         }
-        .toggle-switch .slider {
-            position: absolute;
+
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .header {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .logo i {
+            color: var(--accent);
+            font-size: 32px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: white;
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .creator-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 30px;
+        }
+
+        /* الشريط الجانبي */
+        .sidebar {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--card-radius);
+            padding: 25px;
+            height: fit-content;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title i {
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+
+        /* أزرار التاقت */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .tag {
+            background: rgba(99, 102, 241, 0.2);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-size: 14px;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            border-radius: 9999px;
-            transition: background-color 0.3s;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        .toggle-switch input:checked + .slider {
-            background-color: #3b82f6;
+
+        .tag:hover, .tag.active {
+            background: var(--primary);
+            transform: translateY(-2px);
         }
-        [dir="rtl"] .terms-table th, [dir="rtl"] .terms-table td {
-            text-align: right;
+
+        .tag i {
+            font-size: 12px;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--card-radius);
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .prompt-section {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: var(--card-radius);
+            padding: 25px;
+        }
+
+        .form-group-lg label {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        textarea.form-control-lg {
+            min-height: 200px;
+            resize: vertical;
+            font-size: 18px;
+            line-height: 1.8;
+            padding: 20px;
+        }
+
+        .character-count {
+            text-align: left;
+            color: #94a3b8;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .suggestions {
+            background: rgba(236, 72, 153, 0.1);
+            border-left: 3px solid var(--accent);
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            margin-top: 20px;
+        }
+
+        .suggestions h4 {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent);
+        }
+
+        .suggestions ul {
+            padding-right: 20px;
+        }
+
+        .suggestions li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .preview-section {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: var(--card-radius);
+            padding: 25px;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .quality-meter {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .meter-bar {
+            flex: 1;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 5px;
+            width: 82%;
+        }
+
+        .preview-content {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 15px;
+            line-height: 1.8;
+            font-size: 17px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .preview-title {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .preview-text {
+            color: #cbd5e1;
+        }
+
+        .preview-keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .keyword {
+            background: rgba(99, 102, 241, 0.2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 14px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .templates-section {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: var(--card-radius);
+            padding: 25px;
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .template-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .template-card:hover {
+            background: rgba(99, 102, 241, 0.2);
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .template-card h4 {
+            margin-bottom: 10px;
+            font-size: 17px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .template-card p {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .template-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .ai-assistant {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+            z-index: 100;
+            transition: var(--transition);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+
+        .ai-assistant:hover {
+            transform: scale(1.1) rotate(10deg);
+            animation: none;
+        }
+
+        /* التكيف مع الموبايل */
+        @media (max-width: 992px) {
+            .creator-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
-
-<body>
-	
 </head>
-
-    <div id="root"></div>
-
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-
-        function App() {
-            // State for terms dictionary
-            const [terms, setTerms] = useState([
-                { ar: "واقعي", en: "Realistic" },
-                { ar: "كارتوني", en: "Cartoon" },
-                { ar: "ثلاثي الأبعاد", en: "3D" },
-                { ar: "مستقبلي", en: "Futuristic" },
-                { ar: "انطباعي", en: "Impressionist" }
-            ]);
-
-            // State for AI tools
-            const [tools, setTools] = useState(["MidJourney", "DALL·E", "Stable Diffusion", "Runway ML"]);
-
-            // State for attributes
-            const [attributes, setAttributes] = useState({
-                human: ["شعر: أسود", "ملابس: رسمية", "إكسسوارات: ساعة"],
-                animal: ["فراء: بني", "بيئة: غابة", "حجم: كبير"],
-                nature: ["أشجار: كثيفة", "إضاءة: شروق", "جو: هادئ"],
-                machine: ["لون: فضي", "إضاءة: نيون", "تصميم: انسيابي"]
-            });
-
-            // State for form inputs
-            const [formData, setFormData] = useState({
-                humanGender: "ذكر",
-                humanAge: "شاب",
-                humanExpression: "طبيعي",
-                animalType: "أسد",
-                animalAction: "واقف",
-                natureType: "غابة",
-                natureWeather: "مشمس",
-                machineType: "سيارة",
-                machineStyle: "حديث"
-            });
-
-            // State for active categories
-            const [activeCategories, setActiveCategories] = useState({
-                human: true,
-                animal: true,
-                nature: true,
-                machine: true
-            });
-
-            // State for generated prompt
-            const [generatedPrompt, setGeneratedPrompt] = useState("");
-
-            // State for new term input
-            const [newTerm, setNewTerm] = useState({ ar: "", en: "" });
-
-            // State for new tool input
-            const [newTool, setNewTool] = useState("");
-
-            // Load data from localStorage if available
-            useEffect(() => {
-                const storedTerms = JSON.parse(localStorage.getItem("terms"));
-                const storedTools = JSON.parse(localStorage.getItem("tools"));
-                const storedAttributes = JSON.parse(localStorage.getItem("attributes"));
-
-                if (storedTerms) setTerms(storedTerms);
-                if (storedTools) setTools(storedTools);
-                if (storedAttributes) setAttributes(storedAttributes);
-            }, []);
-
-            // Save data to localStorage when it changes
-            useEffect(() => {
-                localStorage.setItem("terms", JSON.stringify(terms));
-            }, [terms]);
-
-            useEffect(() => {
-                localStorage.setItem("tools", JSON.stringify(tools));
-            }, [tools]);
-
-            useEffect(() => {
-                localStorage.setItem("attributes", JSON.stringify(attributes));
-            }, [attributes]);
-
-            // Toggle category activation
-            const toggleCategory = (category) => {
-                setActiveCategories(prev => ({
-                    ...prev,
-                    [category]: !prev[category]
-                }));
-            };
-
-            // Add a new attribute
-            const addAttribute = (type) => {
-                const inputId = `new-${type}-attribute`;
-                const input = document.getElementById(inputId);
-                const value = input.value.trim();
-                
-                if (value) {
-                    setAttributes(prev => ({
-                        ...prev,
-                        [type]: [...prev[type], value]
-                    }));
-                    input.value = "";
-                }
-            };
-
-            // Edit an existing attribute
-            const editAttribute = (type, index) => {
-                const newValue = prompt("عدل الصفة:", attributes[type][index]);
-                if (newValue !== null) {
-                    setAttributes(prev => {
-                        const updated = [...prev[type]];
-                        updated[index] = newValue;
-                        return {
-                            ...prev,
-                            [type]: updated
-                        };
-                    });
-                }
-            };
-
-            // Delete an attribute
-            const deleteAttribute = (type, index) => {
-                if (window.confirm("هل أنت متأكد من حذف هذه الصفة؟")) {
-                    setAttributes(prev => {
-                        const updated = [...prev[type]];
-                        updated.splice(index, 1);
-                        return {
-                            ...prev,
-                            [type]: updated
-                        };
-                    });
-                }
-            };
-
-            // Handle form input changes
-            const handleInputChange = (e) => {
-                const { name, value } = e.target;
-                setFormData(prev => ({
-                    ...prev,
-                    [name]: value
-                }));
-            };
-
-            // Generate the final prompt
-            const generatePrompt = () => {
-                let prompt = "أريد صورة ";
-
-                // Human section
-                if (activeCategories.human) {
-                    prompt += `لبشري (${formData.humanGender}, ${formData.humanAge}, ${formData.humanExpression}) `;
-                    if (attributes.human.length > 0) {
-                        prompt += `مع ${attributes.human.join(", ")} `;
-                    }
-                }
-
-                // Animal section
-                if (activeCategories.animal) {
-                    prompt += `وحيوان ${formData.animalType} ${formData.animalAction} `;
-                    if (attributes.animal.length > 0) {
-                        prompt += `مع ${attributes.animal.join(", ")} `;
-                    }
-                }
-
-                // Nature section
-                if (activeCategories.nature) {
-                    prompt += `في ${formData.natureType} أثناء ${formData.natureWeather} `;
-                    if (attributes.nature.length > 0) {
-                        prompt += `مع ${attributes.nature.join(", ")} `;
-                    }
-                }
-
-                // Machine section
-                if (activeCategories.machine) {
-                    prompt += `وآلة ${formData.machineType} ${formData.machineStyle} `;
-                    if (attributes.machine.length > 0) {
-                        prompt += `مع ${attributes.machine.join(", ")} `;
-                    }
-                }
-
-                prompt += ". النمط الفني: واقعي عالي الدقة.";
-
-                setGeneratedPrompt(prompt);
-            };
-
-            // Copy prompt to clipboard
-            const copyPrompt = () => {
-                navigator.clipboard.writeText(generatedPrompt).then(() => {
-                    alert("تم نسخ البرومبت!");
-                });
-            };
-
-            // Clear prompt
-            const clearPrompt = () => {
-                setGeneratedPrompt("");
-            };
-
-            // Add a new term to the dictionary
-            const handleAddTerm = () => {
-                if (newTerm.ar && newTerm.en) {
-                    setTerms([...terms, { ...newTerm }]);
-                    setNewTerm({ ar: "", en: "" });
-                }
-            };
-
-            // Edit a term in the dictionary
-            const editTerm = (index) => {
-                const currentTerm = terms[index];
-                const newAr = prompt("عدل المصطلح العربي:", currentTerm.ar);
-                if (newAr !== null) {
-                    const newEn = prompt("عدل المصطلح الإنجليزي:", currentTerm.en);
-                    if (newEn !== null) {
-                        const updatedTerms = [...terms];
-                        updatedTerms[index] = { ar: newAr, en: newEn };
-                        setTerms(updatedTerms);
-                    }
-                }
-            };
-
-            // Delete a term from the dictionary
-            const deleteTerm = (index) => {
-                if (window.confirm("هل أنت متأكد من حذف هذا المصطلح؟")) {
-                    setTerms(terms.filter((_, i) => i !== index));
-                }
-            };
-
-            // Add a new AI tool
-            const handleAddTool = () => {
-                if (newTool && !tools.includes(newTool)) {
-                    setTools([...tools, newTool]);
-                    setNewTool("");
-                }
-            };
-
-            // Edit an AI tool
-            const editTool = (oldTool) => {
-                const newToolName = prompt("عدل اسم الأداة:", oldTool);
-                if (newToolName && newToolName !== oldTool) {
-                    setTools(tools.map(tool => tool === oldTool ? newToolName : tool));
-                }
-            };
-
-            // Delete an AI tool
-            const deleteTool = (tool) => {
-                if (window.confirm(`هل أنت متأكد من حذف أداة "${tool}"؟`)) {
-                    setTools(tools.filter(t => t !== tool));
-                }
-            };
-
-            return (
-                <div className="container mx-auto p-6">
-                    <a href="index.html" className="back-btn inline-flex items-center text-blue-600 mb-6">
-                        <i className="fas fa-arrow-right"></i> الصفحة الرئيسية
-                    </a>
-
-                    <header className="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-6 rounded-lg shadow-md text-center mb-8">
-                        <h2 className="text-2xl font-bold flex items-center justify-center">
-                            <i className="fas fa-robot ml-2"></i> مولد برومبتات الذكاء الاصطناعي
-                        </h2>
-                        <p className="subtitle mt-2 opacity-90">اكتب وصفا دقيقا لإنشاء برومت</p>
-                    </header>
-  <div className="card bg-white rounded-lg shadow-md p-6 transition-transform hover:-translate-y-1 hover:shadow-lg">
-        <a href="human-prompts.html" class="btn">اختر من المكتبة</a>
+<body>
+    <!-- رأس الصفحة -->
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-magic"></i>
+            <h1>Promptica</h1>
         </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        {/* Human Section */}
-                        <div className="card bg-white rounded-lg shadow-md p-6 transition-transform hover:-translate-y-1 hover:shadow-lg">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="card-title text-xl font-semibold text-blue-600 flex items-center">
-                                    <i className="fas fa-user ml-2"></i> وصف البشر
-                                </h2>
-                                <label className="toggle-switch relative inline-block w-12 h-6">
-                                    <input 
-                                        type="checkbox" 
-                                        checked={activeCategories.human}
-                                        onChange={() => toggleCategory('human')}
-                                        className="opacity-0 w-0 h-0"
-                                    />
-                                    <span className="slider absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 rounded-full transition-colors duration-300 after:absolute after:bg-white after:h-5 after:w-5 after:rounded-full after:top-0.5 after:left-0.5 after:transition-all after:duration-300 checked:after:translate-x-6 checked:bg-blue-500"></span>
-                                </label>
-                            </div>
-
-                            {activeCategories.human && (
-                                <>
-                                    <div className="form-group mb-4">
-                                        <label htmlFor="human-gender" className="block mb-2 font-medium">الجنس</label>
-                                        <select
-                                            id="human-gender"
-                                            name="humanGender"
-                                            value={formData.humanGender}
-                                            onChange={handleInputChange}
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all"
-                                        >
-                                            <option value="ذكر">ذكر</option>
-                                            <option value="أنثى">أنثى</option>
-                                            <option value="غير محدد">غير محدد</option>
-                                        </select>
-                                    </div>
-
-                                    <div className="form-group mb-4">
-                                        <label htmlFor="human-age" className="block mb-2 font-medium">العمر</label>
-                                        <select
-                                            id="human-age"
-                                            name="humanAge"
-                                            value={formData.humanAge}
-                                            onChange={handleInputChange}
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all"
-                                        >
-                                            <option value="طفل">طفل</option>
-                                            <option value="مراهق">مراهق</option>
-                                            <option value="شاب" selected>شاب</option>
-                                            <option value="ناضج">ناضج</option>
-                                            <option value="كبير السن">كبير السن</option>
-                                        </select>
-                                    </div>
-
-                                    <div className="form-group mb-4">
-                                        <label htmlFor="human-expression" className="block mb-2 font-medium">التعبير</label>
-                                        <select
-                                            id="human-expression"
-                                            name="humanExpression"
-                                            value={formData.humanExpression}
-                                            onChange={handleInputChange}
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all"
-                                        >
-                                            <option value="طبيعي">طبيعي</option>
-                                            <option value="سعيد">سعيد</option>
-                                            <option value="غاضب">غاضب</option>
-                                            <option value="متفاجئ">متفاجئ</option>
-                                            <option value="حزين">حزين</option>
-                                        </select>
-                                    </div>
-
-                                    <div className="form-group mb-4">
-                                        <label htmlFor="new-human-attribute" className="block mb-2 font-medium">إضافة صفة جديدة</label>
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                id="new-human-attribute"
-                                                placeholder="مثال: لون الشعر أسود"
-                                                className="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all"
-                                            />
-                                            <button
-                                                onClick={() => addAttribute("human")}
-                                                className="btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-                                            >
-                                                إضافة
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="attribute-list mt-4 pt-4 border-t border-gray-200">
-                                        {attributes.human.map((attr, index) => (
-                                            <div key={index} className="attribute-item flex justify-between py-2 border-b border-dashed border-gray-200">
-                                                <span>{attr}</span>
-                                                <div className="attribute-actions flex gap-2">
-                                                    <button
-                                                        onClick={() => editAttribute("human", index)}
-                                                        className="btn btn-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors"
-                                                    >
-                                                        تعديل
-                                                    </button>
-                                                    <button
-                                                        onClick={() => deleteAttribute("human", index)}
-                                                        className="btn btn-sm btn-danger bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors"
-                                                    >
-                                                        حذف
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </>
-                            )}
-                        </div>
-
-                        {/* Animal Section */}
-                        <div className="card bg-white rounded-lg shadow-md p-6 transition-transform hover:-translate-y-1 hover:shadow-lg">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="card-title text-xl font-semibold text-blue-600 flex items-center">
-                                    <i className="fas fa-paw ml-2"></i> وصف الحيوانات
-                                </h2>
-                                <label className="toggle-switch relative inline-block w-12 h-6">
-                                    <input 
-                                        type="checkbox" 
-                                        checked={activeCategories.animal}
-                                        onChange={() => toggleCategory('animal')}
-                                        className="opacity-0 w-0 h-0"
-                                    />
-                                    <span className="slider absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 rounded-full transition-colors duration-300 after:absolute after:bg-white after:h-5 after:w-5 after:rounded-full after:top-0.5 after:left-0.5 after:transition-all after:duration-300 checked:after:translate-x-6 checked:bg-blue-500"></span>
-                                </label>
-                            </div>
-
-                            {activeCategories.animal && (
-                                <>
-                                    <div className="form-group mb-4">
-                                        <label htmlFor="animal-type" className="block mb-2 font-medium">نوع الحيوان</label>
-                                        <select
-                                            id="animal-type"
-                                            name="animalType"
-                                            value={formData.animalType}
-                                            onChange={handleInputChange}
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all"
-                                        >
-                                            <option value="أسد">أسد</option>
-                                            <option value="نمر">نمر</option>
-                                            <option value="فهد">فهد</option>
-                                            <option value="دب">دب</option>
-                                            <option value="ذئب">ذئب</option>
-                                        </select>
-                                    </div>
-
-                                    <div className="form-group mb-4">
-                                        <label htmlFor="animal-action" className="block mb-2 font-medium">الحركة</label>
-                                        <select
-                                            id="animal-action"
-                                            name="animalAction"
-                                            value={formData.animalAction}
-                                            onChange={handleInputChange}
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all"
-                                        >
-                                            <option value="واقف">واقف</option>
-                                            <option value="يجري">يجري</option>
-                                            <option value="ينقض">ينقض</option>
-                                            <option value="نائم">نائم</option>
-                                        </select>
-                                    </div>
-
-                                    <div className="form-group mb-4">
-                                        <label htmlFor="new-animal-attribute" className="block mb-2 font-medium">إضافة صفة جديدة</label>
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                id="new-animal-attribute"
-                                                placeholder="مثال: لون الفراء بني"
-                                                className="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all"
-                                            />
-                                            <button
-                                                onClick={() => addAttribute("animal")}
-                                                className="btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-                                            >
-                                                إضافة
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="attribute-list mt-4 pt-4 border-t border-gray-200">
-                                        {attributes.animal.map((attr, index) => (
-                                            <div key={index} className="attribute-item flex justify-between py-2 border-b border-dashed border-gray-200">
-                                                <span>{attr}</span>
-                                                <div className="attribute-actions flex gap-2">
-                                                    <button
-                                                        onClick={() => editAttribute("animal", index)}
-                                                        className="btn btn-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors"
-                                                    >
-                                                        تعديل
-                                                    </button>
-                                                    <button
-                                                        onClick={() => deleteAttribute("animal", index)}
-                                                        className="btn btn-sm btn-danger bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors"
-                                                    >
-                                                        حذف
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </>
-                            )}
-                        </div>
-
-                        {/* Nature Section */}
-                        <div className="card bg-white rounded-lg shadow-md p-6 transition-transform hover:-translate-y-1 hover:shadow-lg">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="card-title text-xl font-semibold text-blue-600 flex items-center">
-                                    <i className="fas fa-tree ml-2"></i> وصف الطبيعة
-                                </h2>
-                                <label className="toggle-switch relative inline-block w-12 h-6">
-                                    <input 
-                                        type="checkbox" 
-                                        checked={activeCategories.nature}
-                                        onChange={() => toggleCategory('nature')}
-                                        className="opacity-0 w-0 h-0"
-                                    />
-                                    <span className="slider absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 rounded-full transition-colors duration-300 after:absolute after:bg-white after:h-5 after:w-5 after:rounded-full after:top-0.5 after:left-0.5 after:transition-all after:duration-300 checked:after:translate-x-6 checked:bg-blue-500"></span>
-                                </label>
-                            </div>
-
-                            {activeCategories.nature && (
-                                <>
-                                    <div className="form-group mb-4">
-                                        <label htmlFor="nature-type" className="block mb-2 font-medium">نوع المشهد</label>
-                                        <select
-                                            id="nature-type"
-                                            name="natureType"
-                                            value={formData.natureType}
-                                            onChange={handleInputChange}
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all"
-                                        >
-                                            <option value="غابة">غابة</option>
-                                            <option value="جبل">جبل</option>
-                                            <option value="شاطئ">شاطئ</option>
-                                            <option value="صحراء">صحراء</option>
-                                            <option value="حديقة">حديقة</option>
-                                        </select>
-                                    </div>
-
-                                    <div className="form-group mb-4">
-                                        <label htmlFor="nature-weather" className="block mb-2 font-medium">الطقس</label>
-                                        <select
-                                            id="nature-weather"
-                                            name="natureWeather"
-                                            value={formData.natureWeather}
-                                            onChange={handleInputChange}
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all"
-                                        >
-                                            <option value="مشمس">مشمس</option>
-                                            <option value="ممطر">ممطر</option>
-                                            <option value="غائم">غائم</option>
-                                            <option value="ثلجي">ثلجي</option>
-                                            <option value="ضبابي">ضبابي</option>
-                                        </select>
-                                    </div>
-
-                                    <div className="form-group mb-4">
-                                        <label htmlFor="new-nature-attribute" className="block mb-2 font-medium">إضافة صفة جديدة</label>
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                id="new-nature-attribute"
-                                                placeholder="مثال: أشجار كثيفة"
-                                                className="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all"
-                                            />
-                                            <button
-                                                onClick={() => addAttribute("nature")}
-                                                className="btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-                                            >
-                                                إضافة
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="attribute-list mt-4 pt-4 border-t border-gray-200">
-                                        {attributes.nature.map((attr, index) => (
-                                            <div key={index} className="attribute-item flex justify-between py-2 border-b border-dashed border-gray-200">
-                                                <span>{attr}</span>
-                                                <div className="attribute-actions flex gap-2">
-                                                    <button
-                                                        onClick={() => editAttribute("nature", index)}
-                                                        className="btn btn-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors"
-                                                    >
-                                                        تعديل
-                                                    </button>
-                                                    <button
-                                                        onClick={() => deleteAttribute("nature", index)}
-                                                        className="btn btn-sm btn-danger bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors"
-                                                    >
-                                                        حذف
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </>
-                            )}
-                        </div>
-
-                        {/* Machine Section */}
-                        <div className="card bg-white rounded-lg shadow-md p-6 transition-transform hover:-translate-y-1 hover:shadow-lg">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="card-title text-xl font-semibold text-blue-600 flex items-center">
-                                    <i className="fas fa-cog ml-2"></i> وصف الآلات
-                                </h2>
-                                <label className="toggle-switch relative inline-block w-12 h-6">
-                                    <input 
-                                        type="checkbox" 
-                                        checked={activeCategories.machine}
-                                        onChange={() => toggleCategory('machine')}
-                                        className="opacity-0 w-0 h-0"
-                                    />
-                                    <span className="slider absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 rounded-full transition-colors duration-300 after:absolute after:bg-white after:h-5 after:w-5 after:rounded-full after:top-0.5 after:left-0.5 after:transition-all after:duration-300 checked:after:translate-x-6 checked:bg-blue-500"></span>
-                                </label>
-                            </div>
-
-                            {activeCategories.machine && (
-                                <>
-                                    <div className="form-group mb-4">
-                                        <label htmlFor="machine-type" className="block mb-2 font-medium">نوع الآلة</label>
-                                        <select
-                                            id="machine-type"
-                                            name="machineType"
-                                            value={formData.machineType}
-                                            onChange={handleInputChange}
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all"
-                                        >
-                                            <option value="سيارة">سيارة</option>
-                                            <option value="طائرة">طائرة</option>
-                                            <option value="روبوت">روبوت</option>
-                                            <option value="آلة موسيقية">آلة موسيقية</option>
-                                            <option value="آلة صناعية">آلة صناعية</option>
-                                        </select>
-                                    </div>
-
-                                    <div className="form-group mb-4">
-                                        <label htmlFor="machine-style" className="block mb-2 font-medium">النمط</label>
-                                        <select
-                                            id="machine-style"
-                                            name="machineStyle"
-                                            value={formData.machineStyle}
-                                            onChange={handleInputChange}
-                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all"
-                                        >
-                                            <option value="حديث">حديث</option>
-                                            <option value="قديم">قديم</option>
-                                            <option value="مستقبلي">مستقبلي</option>
-                                            <option value="خيالي">خيالي</option>
-                                        </select>
-                                    </div>
-
-                                    <div className="form-group mb-4">
-                                        <label htmlFor="new-machine-attribute" className="block mb-2 font-medium">إضافة صفة جديدة</label>
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                id="new-machine-attribute"
-                                                placeholder="مثال: لون أحمر لامع"
-                                                className="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all"
-                                            />
-                                            <button
-                                                onClick={() => addAttribute("machine")}
-                                                className="btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-                                            >
-                                                إضافة
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="attribute-list mt-4 pt-4 border-t border-gray-200">
-                                        {attributes.machine.map((attr, index) => (
-                                            <div key={index} className="attribute-item flex justify-between py-2 border-b border-dashed border-gray-200">
-                                                <span>{attr}</span>
-                                                <div className="attribute-actions flex gap-2">
-                                                    <button
-                                                        onClick={() => editAttribute("machine", index)}
-                                                        className="btn btn-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors"
-                                                    >
-                                                        تعديل
-                                                    </button>
-                                                    <button
-                                                        onClick={() => deleteAttribute("machine", index)}
-                                                        className="btn btn-sm btn-danger bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors"
-                                                    >
-                                                        حذف
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Preview Section */}
-                    <div className="preview-section bg-white rounded-lg shadow-md p-6 mb-8">
-                        <h2 className="card-title text-xl font-semibold text-blue-600 flex items-center mb-4">
-                            <i className="fas fa-eye ml-2"></i> المعاينة السريعة
-                        </h2>
-                        <div className="preview-box p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <p className="text-gray-600">الأقسام المفعّلة:</p>
-                            <ul className="mt-2 space-y-1">
-                                {Object.entries(activeCategories).map(([category, isActive]) => (
-                                    isActive && (
-                                        <li key={category} className="flex items-center text-green-600">
-                                            <i className="fas fa-check-circle ml-2"></i>
-                                            {category === 'human' && 'وصف البشر'}
-                                            {category === 'animal' && 'وصف الحيوانات'}
-                                            {category === 'nature' && 'وصف الطبيعة'}
-                                            {category === 'machine' && 'وصف الآلات'}
-                                        </li>
-                                    )
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-
-                    {/* Final Prompt Section */}
-                    <div className="result-section mb-8">
-                        <h2 className="card-title text-xl font-semibold text-blue-600 flex items-center mb-4">
-                            <i className="fas fa-magic ml-2"></i> البرومبت النهائي
-                        </h2>
-                        <div className="result-box bg-white rounded-lg shadow-md p-6">
-                            <textarea
-                                id="generated-prompt"
-                                value={generatedPrompt}
-                                readOnly
-                                placeholder="سيظهر البرومبت هنا بعد الضغط على زر التوليد"
-                                className="w-full min-h-[150px] p-4 border border-gray-300 rounded-lg resize-vertical text-gray-700"
-                            ></textarea>
-                            <div className="copy-btn flex gap-3 mt-4">
-                                <button
-                                    onClick={generatePrompt}
-                                    className="btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
-                                >
-                                    توليد البرومبت
-                                </button>
-                                <button
-                                    onClick={copyPrompt}
-                                    className="btn btn-secondary bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors"
-                                >
-                                    <i className="far fa-copy ml-1"></i> نسخ
-                                </button>
-                                <button
-                                    onClick={clearPrompt}
-                                    className="btn btn-danger bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition-colors"
-                                >
-                                    <i className="far fa-trash-alt ml-1"></i> مسح
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* AI Tools Section */}
-                    <div className="tools-section mb-8">
-                        <h2 className="card-title text-xl font-semibold text-blue-600 flex items-center mb-4">
-                            <i className="fas fa-tools ml-2"></i> أدوات الذكاء الاصطناعي المدعومة
-                        </h2>
-                        <div className="tools-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
-                            {tools.map((tool, index) => (
-                                <div key={index} className="tool-card bg-white rounded-lg shadow-md p-4 flex justify-between items-center">
-                                    <span className="font-medium">{tool}</span>
-                                    <div className="attribute-actions flex gap-2">
-                                        <button
-                                            onClick={() => editTool(tool)}
-                                            className="btn btn-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors"
-                                        >
-                                            تعديل
-                                        </button>
-                                        <button
-                                            onClick={() => deleteTool(tool)}
-                                            className="btn btn-sm btn-danger bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors"
-                                        >
-                                            حذف
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                id="new-tool"
-                                value={newTool}
-                                onChange={(e) => setNewTool(e.target.value)}
-                                placeholder="اسم الأداة الجديدة"
-                                className="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all"
-                            />
-                            <button
-                                onClick={handleAddTool}
-                                className="btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-                            >
-                                إضافة أداة
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Terms Dictionary Section */}
-                    <div className="terms-section">
-                        <h2 className="card-title text-xl font-semibold text-blue-600 flex items-center mb-4">
-                            <i className="fas fa-book ml-2"></i> قاموس المصطلحات
-                        </h2>
-                        <table className="terms-table w-full border-collapse bg-white rounded-lg overflow-hidden shadow-md mb-4">
-                            <thead>
-                                <tr className="bg-blue-600 text-white">
-                                    <th className="p-3 text-right">العربية</th>
-                                    <th className="p-3 text-right">English</th>
-                                    <th className="p-3 text-right">إجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {terms.map((term, index) => (
-                                    <tr key={index} className="hover:bg-gray-50 transition-colors">
-                                        <td className="p-3 border-b border-gray-200">{term.ar}</td>
-                                        <td className="p-3 border-b border-gray-200">{term.en}</td>
-                                        <td className="p-3 border-b border-gray-200">
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => editTerm(index)}
-                                                    className="btn btn-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors"
-                                                >
-                                                    تعديل
-                                                </button>
-                                                <button
-                                                    onClick={() => deleteTerm(index)}
-                                                    className="btn btn-sm btn-danger bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors"
-                                                >
-                                                    حذف
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        <div className="add-term-form grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <input
-                                type="text"
-                                id="new-term-ar"
-                                value={newTerm.ar}
-                                onChange={(e) => setNewTerm({...newTerm, ar: e.target.value})}
-                                placeholder="المصطلح العربي"
-                                className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all"
-                            />
-                            <input
-                                type="text"
-                                id="new-term-en"
-                                value={newTerm.en}
-                                onChange={(e) => setNewTerm({...newTerm, en: e.target.value})}
-                                placeholder="المصطلح الإنجليزي"
-                                className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all"
-                            />
-                            <button
-                                onClick={handleAddTerm}
-                                className="btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-                            >
-                                إضافة مصطلح
-                            </button>
+        
+        <div class="nav-links">
+            <a href="#" class="active">منشئ البرومبتات</a>
+            <a href="#">المعرض</a>
+            <a href="#">المكتبة الفنية</a>
+            <a href="#">قوالب جاهزة</a>
+            <a href="#">الدليل الاحترافي</a>
+        </div>
+    </div>
+    
+    <!-- المحتوى الرئيسي -->
+    <div class="creator-container">
+        <!-- الشريط الجانبي -->
+        <div class="sidebar">
+            <div class="section-title">
+                <i class="fas fa-cog"></i>
+                <h3>الإعدادات الأساسية</h3>
+            </div>
+            
+            <div class="form-group">
+                <label for="contentType">نوع المحتوى</label>
+                <select id="contentType" class="form-control">
+                    <option value="">اختر نوع المحتوى</option>
+                    <option>صورة ثابتة</option>
+                    <option>صورة متحركة (GIF)</option>
+                    <option>فيديو قصير</option>
+                    <option>فيديو طويل</option>
+                    <option>تصميم ثلاثي الأبعاد</option>
+                    <option>صورة بانورامية</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="contentStyle">النمط الفني</label>
+                <select id="contentStyle" class="form-control">
+                    <option value="">اختر النمط الفني</option>
+                    <option>واقعي فوتوغرافي</option>
+                    <option>رسم أنيمي</option>
+                    <option>سريالي</option>
+                    <option>انطباعي</option>
+                    <option>فن الخط</option>
+                    <option>تخطيطي</option>
+                    <option>زيتي كلاسيكي</option>
+                    <option>فن البوب</option>
+                    <option>فن الفيكتوري</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="resolution">الدقة والأبعاد</label>
+                <select id="resolution" class="form-control">
+                    <option value="">اختر الدقة</option>
+                    <option>1024x1024 (مربع)</option>
+                    <option>1920x1080 (أفقي)</option>
+                    <option>1080x1920 (عمودي)</option>
+                    <option>4K - 3840x2160</option>
+                    <option>8K - 7680x4320</option>
+                    <option>1:1 (مربع)</option>
+                    <option>16:9 (عرضي)</option>
+                    <option>9:16 (عمودي)</option>
+                </select>
+            </div>
+            
+            <div class="section-title">
+                <i class="fas fa-palette"></i>
+                <h3>المكتبة الفنية</h3>
+            </div>
+            
+            <div class="form-group">
+                <label>مصطلحات إضاءة</label>
+                <div class="tags-container">
+                    <div class="tag"><i class="fas fa-sun"></i> إضاءة ناعمة</div>
+                    <div class="tag active"><i class="fas fa-theater-masks"></i> إضاءة دراماتيكية</div>
+                    <div class="tag"><i class="fas fa-sunrise"></i> إضاءة غولدن آور</div>
+                    <div class="tag"><i class="fas fa-lightbulb"></i> إضاءة نيون</div>
+                    <div class="tag"><i class="fas fa-cloud-sun"></i> إضاءة طبيعية</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>تقنيات التصوير</label>
+                <div class="tags-container">
+                    <div class="tag"><i class="fas fa-camera"></i> عمق مجال ضحل</div>
+                    <div class="tag active"><i class="fas fa-moon"></i> لون أحادي</div>
+                    <div class="tag"><i class="fas fa-running"></i> حركة بطيئة</div>
+                    <div class="tag"><i class="fas fa-dove"></i> زاوية عين الطائر</div>
+                    <div class="tag"><i class="fas fa-search-plus"></i> ماكرو</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>فنانون مرجعيون</label>
+                <div class="tags-container">
+                    <div class="tag"><i class="fas fa-paint-brush"></i> فان جوخ</div>
+                    <div class="tag"><i class="fas fa-paint-brush"></i> سلفادور دالي</div>
+                    <div class="tag"><i class="fas fa-paint-brush"></i> هيرونيموس بوش</div>
+                    <div class="tag"><i class="fas fa-paint-brush"></i> هاياو ميازاكي</div>
+                    <div class="tag"><i class="fas fa-paint-brush"></i> كليمت</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>الجو العام</label>
+                <div class="tags-container">
+                    <div class="tag"><i class="fas fa-cloud"></i> غامض</div>
+                    <div class="tag"><i class="fas fa-smile"></i> سعيد</div>
+                    <div class="tag"><i class="fas fa-sad-tear"></i> حزين</div>
+                    <div class="tag"><i class="fas fa-wind"></i> سريالي</div>
+                    <div class="tag"><i class="fas fa-magic"></i> سحري</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-full">
+                <i class="fas fa-save"></i> حفظ القالب
+            </button>
+        </div>
+        
+        <!-- المحتوى الرئيسي -->
+        <div class="main-content">
+            <!-- قسم كتابة البرومبت -->
+            <div class="prompt-section">
+                <div class="section-title">
+                    <i class="fas fa-edit"></i>
+                    <h3>صياغة البرومبت</h3>
+                </div>
+                
+                <div class="form-group form-group-lg">
+                    <label for="promptTitle">عنوان البرومبت</label>
+                    <input type="text" id="promptTitle" class="form-control" 
+                           placeholder="أدخل عنوانًا جذابًا يصف المحتوى بدقة..." 
+                           value="منظر طبيعي خلاب عند شروق الشمس">
+                </div>
+                
+                <div class="form-group form-group-lg">
+                    <label for="promptText">نص البرومبت المتخصص</label>
+                    <textarea id="promptText" class="form-control form-control-lg" 
+                              placeholder="صِف ما تريد إنشاؤه بالتفصيل، مستخدمًا المصطلحات الفنية المناسبة...">صورة واقعية فوتوغرافية لمنظر طبيعي خلاب عند شروق الشمس، إضاءة غولدن آور تلامس قمم الجبال المغطاة بالثلوج، ضباب خفيف في الوديان، ألوان دافئة تنتشر في السماء مع سحب رقيقة، عمق مجال ضحل مع تركيز على زهرة في المقدمة، تفاصيل عالية الدقة (8K)، نمط تصوير بانورامي، نسبة إطار 16:9، جو هادئ وساحر، تأثيرات طبيعية منعكسة على بحيرة صافية.</textarea>
+                    <div class="character-count">عدد الحروف: 287</div>
+                </div>
+                
+                <div class="suggestions">
+                    <h4><i class="fas fa-lightbulb"></i> اقتراحات لتحسين الجودة</h4>
+                    <ul>
+                        <li>يمكن إضافة تفاصيل عن نوع النباتات في المقدمة (مثل: زنابق، أزهار برية)</li>
+                        <li>اقترح تحديد نوع الجبال (مثل: جبال الألب، جبال روكي) لزيادة الدقة</li>
+                        <li>إضافة تفاصيل عن الحيوانات في المشهد لزيادة الحيوية (مثل: غزال يشرب من البحيرة)</li>
+                        <li>تحديد الموسم (ربيع، صيف، خريف، شتاء) لتحسين السياق</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- قسم المعاينة -->
+            <div class="preview-section">
+                <div class="preview-header">
+                    <h3>معاينة البرومبت</h3>
+                    <div class="quality-meter">
+                        <span>جودة البرومبت: 8.7/10</span>
+                        <div class="meter-bar">
+                            <div class="meter-fill"></div>
                         </div>
                     </div>
                 </div>
-            );
-        }
+                
+                <div class="preview-content">
+                    <div class="preview-title">منظر طبيعي خلاب عند شروق الشمس</div>
+                    <div class="preview-text">صورة واقعية فوتوغرافية لمنظر طبيعي خلاب عند شروق الشمس، إضاءة غولدن آور تلامس قمم الجبال المغطاة بالثلوج، ضباب خفيف في الوديان، ألوان دافئة تنتشر في السماء مع سحب رقيقة، عمق مجال ضحل مع تركيز على زهرة في المقدمة، تفاصيل عالية الدقة (8K)، نمط تصوير بانورامي، نسبة إطار 16:9، جو هادئ وساحر، تأثيرات طبيعية منعكسة على بحيرة صافية.</div>
+                    
+                    <div class="preview-keywords">
+                        <div class="keyword">واقعية فوتوغرافية</div>
+                        <div class="keyword">إضاءة غولدن آور</div>
+                        <div class="keyword">جبال مغطاة بالثلوج</div>
+                        <div class="keyword">بحيرة صافية</div>
+                        <div class="keyword">عمق مجال ضحل</div>
+                        <div class="keyword">8K</div>
+                        <div class="keyword">بانورامي</div>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-sync-alt"></i> توليد معاينة
+                    </button>
+                    <button class="btn">
+                        <i class="fas fa-rocket"></i> نشر البرومبت
+                    </button>
+                </div>
+            </div>
+            
+            <!-- قسم القوالب -->
+            <div class="templates-section">
+                <div class="section-title">
+                    <i class="fas fa-templates"></i>
+                    <h3>قوالب جاهزة</h3>
+                </div>
+                
+                <div class="template-grid">
+                    <div class="template-card">
+                        <h4><i class="fas fa-user"></i> بورتريه احترافي</h4>
+                        <p>صورة بورتريه واقعية مع إضاءة استوديو محكمة، خلفية داكنة، تعابير وجه هادئة...</p>
+                        <div class="template-meta">
+                            <span><i class="fas fa-heart"></i> 128</span>
+                            <span><i class="fas fa-download"></i> 45</span>
+                        </div>
+                    </div>
+                    <div class="template-card">
+                        <h4><i class="fas fa-city"></i> منظر حضاري</h4>
+                        <p>مدينة مستقبلية ليلاً مع أضواء نيون زاهية، أمطار خفيفة، أنعكاسات على الأسطح المبللة...</p>
+                        <div class="template-meta">
+                            <span><i class="fas fa-heart"></i> 98</span>
+                            <span><i class="fas fa-download"></i> 37</span>
+                        </div>
+                    </div>
+                    <div class="template-card">
+                        <h4><i class="fas fa-tree"></i> طبيعة سريالية</h4>
+                        <p>غابة خيالية مع نباتات متوهجة، فطر ضخم متوهج، أضواء خضراء وزرقاء عائمة في الجو...</p>
+                        <div class="template-meta">
+                            <span><i class="fas fa-heart"></i> 142</span>
+                            <span><i class="fas fa-download"></i> 62</span>
+                        </div>
+                    </div>
+                    <div class="template-card">
+                        <h4><i class="fas fa-utensils"></i> طعام شهي</h4>
+                        <p>تصوير طعام احترافي مع إضاءة ناعمة، تركيز على التفاصيل، بخار متصاعد، ألوان زاهية...</p>
+                        <div class="template-meta">
+                            <span><i class="fas fa-heart"></i> 87</span>
+                            <span><i class="fas fa-download"></i> 29</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- مساعد الذكاء الاصطناعي -->
+    <div class="ai-assistant">
+        <i class="fas fa-robot"></i>
+    </div>
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+    <script>
+        // تفعيل نظام التاقت
+        document.querySelectorAll('.tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                tag.classList.toggle('active');
+                
+                // إضافة التاق إلى البرومبت
+                if (tag.classList.contains('active')) {
+                    const promptText = document.getElementById('promptText');
+                    const tagText = tag.textContent.replace('', '').trim();
+                    promptText.value += ` ${tagText},`;
+                    
+                    // تحديث عدد الحروف
+                    updateCharacterCount();
+                }
+            });
+        });
+        
+        // تفعيل القوالب
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const title = card.querySelector('h4').textContent;
+                alert(`تم تحميل قالب "${title}" بنجاح! سيتم الآن تعبئة الحقول بمحتوى القالب.`);
+                
+                // في التطبيق الحقيقي سيتم تحميل محتوى القالب
+                document.getElementById('promptTitle').value = title;
+                document.getElementById('promptText').value = card.querySelector('p').textContent;
+                
+                // تحديث عدد الحروف
+                updateCharacterCount();
+            });
+        });
+        
+        // تحديث عدد الحروف
+        function updateCharacterCount() {
+            const textarea = document.getElementById('promptText');
+            const charCount = textarea.value.length;
+            document.querySelector('.character-count').textContent = `عدد الحروف: ${charCount}`;
+        }
+        
+        // تحديث عدد الحروف عند الكتابة
+        document.getElementById('promptText').addEventListener('input', updateCharacterCount);
+        
+        // مساعد الذكاء الاصطناعي
+        document.querySelector('.ai-assistant').addEventListener('click', () => {
+            const suggestions = [
+                "هل ترغب في تحليل جودة البرومبت الحالي؟",
+                "هل تريد اقتراحات لتحسين الدقة والتفاصيل؟",
+                "هل ترغب في توليد معاينة للنتيجة المتوقعة؟",
+                "هل تريد مساعدة في صياغة برومبت أكثر احترافية؟"
+            ];
+            
+            const randomSuggestion = suggestions[Math.floor(Math.random() * suggestions.length)];
+            alert(`مساعد Promptica:\n\n${randomSuggestion}\n\n[في الإصدار الكامل، سيتم تفعيل المساعد الذكي المتكامل]`);
+        });
+        
+        // زر توليد المعاينة
+        document.querySelector('.btn-outline').addEventListener('click', () => {
+            alert('جاري توليد معاينة للبرومبت...\n\n[في الإصدار الكامل، سيتم عرض نتيجة حقيقية]');
+        });
+        
+        // زر النشر
+        document.querySelector('.btn:not(.btn-outline)').addEventListener('click', () => {
+            alert('تم نشر البرومبت بنجاح!\n\nسيتم الآن إضافته إلى معرض Promptica.');
+        });
+        
+        // تحديث عدد الحروف عند التحميل
+        updateCharacterCount();
     </script>
 </body>
 </html>
