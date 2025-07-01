@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معرض برومبتات Promptica</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --card-radius: 20px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: var(--light);
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .header {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 10px;
+        }
+
+        .search-bar {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 12px 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-bar input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            padding: 5px 10px;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 5px 0;
+        }
+
+        .filter-btn {
+            background: rgba(99, 102, 241, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 80px;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--card-radius);
+            overflow: hidden;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .media-container {
+            position: relative;
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .media-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .media-container img {
+            transform: scale(1.05);
+        }
+
+        .badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--accent);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+            font-size: 20px;
+            color: #e2e8f0;
+        }
+
+        .prompt-text {
+            color: #94a3b8;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .icon-btn:hover {
+            background: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            color: #64748b;
+            font-size: 14px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .add-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 24px;
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .add-btn:hover {
+            background: var(--secondary);
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        /* تفاعلات النسخ */
+        .copied-message {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .copied-show {
+            opacity: 1;
+        }
+
+        /* نافذة الإضافة */
+        .add-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .add-modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            width: 90%;
+            max-width: 600px;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .add-modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            color: #e2e8f0;
+            font-size: 24px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 28px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: var(--accent);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            transition: border 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background: var(--secondary);
+        }
+
+        /* التكيف مع الموبايل */
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 10px 5px;
+            }
+            
+            .add-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+
+            .modal-header h2 {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .card h3 {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="search-bar">
+            <i class="fas fa-search" style="color: #94a3b8; margin-left: 10px;"></i>
+            <input type="text" id="searchInput" placeholder="ابحث عن برومبت...">
+        </div>
+        
+        <div class="filters">
+            <button class="filter-btn active">الكل</button>
+            <button class="filter-btn">DALL-E 3</button>
+            <button class="filter-btn">Midjourney</button>
+            <button class="filter-btn">Stable Diffusion</button>
+            <button class="filter-btn">فيديو</button>
+            <button class="filter-btn">فنون</button>
+            <button class="filter-btn">تصوير</button>
+        </div>
+    </div>
+    
+    <div class="gallery" id="gallery">
+        <!-- سيتم إضافة البطاقات ديناميكيًا بواسطة الجافاسكريبت -->
+    </div>
+    
+    <button class="add-btn" id="addButton">
+        <i class="fas fa-plus"></i>
+    </button>
+    
+    <div class="copied-message" id="copiedMessage">تم نسخ البرومبت!</div>
+    
+    <!-- نافذة إضافة برومبت جديد -->
+    <div class="add-modal" id="addModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>إضافة برومبت جديد</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <form id="addForm">
+                <div class="form-group">
+                    <label for="promptTitle">عنوان البرومبت</label>
+                    <input type="text" id="promptTitle" class="form-control" placeholder="أدخل عنوان جذاب..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="promptText">نص البرومبت</label>
+                    <textarea id="promptText" class="form-control" placeholder="صِف ما تريد إنشاؤه بالتفصيل..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="promptImage">رابط الصورة/الفيديو</label>
+                    <input type="url" id="promptImage" class="form-control" placeholder="https://example.com/image.jpg" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="promptModel">الأداة المستخدمة</label>
+                    <select id="promptModel" class="form-control" required>
+                        <option value="">ااختر الأداة...</option>
+                        <option>DALL-E 3</option>
+                        <option>Midjourney</option>
+                        <option>Stable Diffusion</option>
+                        <option>Kandinsky</option>
+                        <option>DeepSeek</option>
+                        <option>أخرى</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="promptCategory">التصنيف</label>
+                    <select id="promptCategory" class="form-control">
+                        <option value="">عام</option>
+                        <option>فنون</option>
+                        <option>تصوير فوتوغرافي</option>
+                        <option>أنيمي</option>
+                        <option>واقعية</option>
+                        <option>سريالية</option>
+                        <option>تصميم جرافيك</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="submit-btn">إضافة إلى المعرض</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // بيانات نموذجية للمعرض
+        let prompts = [
+            {
+                id: 1,
+                title: "مدينة مستقبلية ليلاً",
+                text: "رسمة رقمية عالية الدقة لمدينة مستقبلية في الليل، أضواء نيون زرقاء ووردية، أمطار خفيفة، أنعكاسات على الأسطح المبللة، أسلوب سايبيربانك، 8k",
+                model: "Midjourney v6",
+                date: "١ يوليو ٢٠٢٥",
+                image: "https://images.unsplash.com/photo-1677442135722-5f8ea49cec8a?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=600&w=800",
+                category: "فنون"
+            },
+            {
+                id: 2,
+                title: "شاطئ ساحر بتأثير السريالية",
+                text: "صورة فوتوغرافية سريالية لشاطئ مع أصداف متوهجة، بحر أرجواني، سماء صفراء وبرتقالية، طيور خيالية في الأفق، تفاصيل عالية الدقة",
+                model: "DALL-E 3",
+                date: "٣٠ يونيو ٢٠٢٥",
+                image: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=600&w=800",
+                category: "سريالية"
+            },
+            {
+                id: 3,
+                title: "بطل خارق في المدينة",
+                text: "رسم أنمي ملون لفتاة خارقة تقف على سطح ناطحة سحاب في مدينة طوكيو ليلاً، شعر أرجواني طويل، ملابس سوداء ووردية متوهجة، منظر خلفي مفصل للمدينة",
+                model: "Stable Diffusion XL",
+                date: "٢٨ يونيو ٢٠٢٥",
+                image: "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=600&w=800",
+                category: "أنيمي"
+            },
+            {
+                id: 4,
+                title: "غابة سحرية مضيئة",
+                text: "غابة خيالية ليلاً مع نباتات متوهجة، فطر ضوئي، أضواء خضراء وزرقاء عائمة، جو سحري وغامض، إضاءة درامية، دقة 4k",
+                model: "Midjourney v5",
+                date: "٢٧ يونيو ٢٠٢٥",
+                image: "https://images.unsplash.com/photo-1476820865390-c52aeebb9891?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=600&w=800",
+                category: "سريالية"
+            }
+        ];
+
+        // عناصر DOM
+        const gallery = document.getElementById('gallery');
+        const addButton = document.getElementById('addButton');
+        const addModal = document.getElementById('addModal');
+        const closeModal = document.getElementById('closeModal');
+        const addForm = document.getElementById('addForm');
+        const searchInput = document.getElementById('searchInput');
+        
+        // إنشاء بطاقات المعرض
+        function renderGallery(promptsArray) {
+            gallery.innerHTML = '';
+            
+            promptsArray.forEach(prompt => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="media-container">
+                        <img src="${prompt.image}" alt="${prompt.title}" loading="lazy">
+                        <div class="badge">${prompt.model}</div>
+                    </div>
+                    <div class="content">
+                        <h3>${prompt.title}</h3>
+                        <p class="prompt-text">${prompt.text}</p>
+                        <div class="actions">
+                            <button class="icon-btn copy-btn" data-prompt="${prompt.text}">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button class="icon-btn expand-btn">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                            <button class="icon-btn share-btn">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                        </div>
+                        <div class="meta">
+                            <span>${prompt.date}</span>
+                            <span>${prompt.category ? `<i class="fas fa-tag"></i> ${prompt.category}` : ''}</span>
+                        </div>
+                    </div>
+                `;
+                gallery.appendChild(card);
+            });
+            
+            // إضافة مستمعي الأحداث للنسخ
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const promptText = btn.getAttribute('data-prompt');
+                    navigator.clipboard.writeText(promptText);
+                    
+                    const message = document.getElementById('copiedMessage');
+                    message.classList.add('copied-show');
+                    
+                    setTimeout(() => {
+                        message.classList.remove('copied-show');
+                    }, 2000);
+                });
+            });
+        }
+        
+        // عرض البطاقات أول مرة
+        renderGallery(prompts);
+        
+        // فتح نافذة الإضافة
+        addButton.addEventListener('click', () => {
+            addModal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // منع التمرير عند فتح النافذة
+        });
+        
+        // إغلاق نافذة الإضافة
+        closeModal.addEventListener('click', () => {
+            addModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+        
+        // إغلاق النافذة عند النقر خارجها
+        window.addEventListener('click', (e) => {
+            if (e.target === addModal) {
+                addModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // معالجة إضافة برومبت جديد
+        addForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const newPrompt = {
+                id: prompts.length + 1,
+                title: document.getElementById('promptTitle').value,
+                text: document.getElementById('promptText').value,
+                image: document.getElementById('promptImage').value,
+                model: document.getElementById('promptModel').value,
+                category: document.getElementById('promptCategory').value,
+                date: new Date().toLocaleDateString('ar-EG', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                })
+            };
+            
+            // إضافة البرومبت الجديد
+            prompts.unshift(newPrompt);
+            
+            // تحديث المعرض
+            renderGallery(prompts);
+            
+            // إغلاق النافذة وإعادة تعيين النموذج
+            addModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            addForm.reset();
+            
+            // إظهار رسالة نجاح
+            const message = document.getElementById('copiedMessage');
+            message.textContent = 'تم إضافة البرومبت بنجاح!';
+            message.classList.add('copied-show');
+            
+            setTimeout(() => {
+                message.classList.remove('copied-show');
+                message.textContent = 'تم نسخ البرومبت!';
+            }, 3000);
+        });
+        
+        // فلترة المحتوى
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const filter = btn.textContent;
+                if (filter === 'الكل') {
+                    renderGallery(prompts);
+                } else {
+                    const filteredPrompts = prompts.filter(prompt => 
+                        prompt.model.includes(filter) || 
+                        prompt.category === filter ||
+                        (filter === 'فيديو' && prompt.image.includes('video'))
+                    );
+                    renderGallery(filteredPrompts);
+                }
+            });
+        });
+        
+        // وظيفة البحث
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredPrompts = prompts.filter(prompt => 
+                prompt.title.toLowerCase().includes(searchTerm) || 
+                prompt.text.toLowerCase().includes(searchTerm)
+            );
+            renderGallery(filteredPrompts);
+        });
+    </script>
+</body>
+</html>
