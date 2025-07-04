@@ -1,377 +1,357 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-	  <meta charset="UTF-8">
-    <title>موقعي الرائع</title>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <meta charset="UTF-8">
+    <title>Promptica - لوحة التحكم</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- React + ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Fuse.js للبحث الذكي -->
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #7c3aed;
+            --accent: #0ea5e9;
+            --light: #f9fafb;
+            --dark: #1f2937;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e6f7ff 100%);
+            color: var(--dark);
+            line-height: 1.8;
+            padding-top: 70px; /* للشريط العلوي */
+            padding-bottom: 70px; /* للشريط السفلي */
+        }
+        
+        /* شريط التنقل العلوي الثابت */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            height: 70px;
+        }
+        
+        /* شريط التنقل السفري الثابت */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 15px;
+            border-radius: 10px;
+            color: #64748b;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active, .nav-item:hover {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+        }
+        
+        .nav-item i {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+        
+        /* تحسينات للجوال */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .tab-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .tab-button {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+            
+            .prompt-card {
+                padding: 10px;
+            }
+            
+            .hidden-mobile {
+                display: none;
+            }
+        }
+        
+        /* بقية الأنماط كما هي مع تحسينات طفيفة */
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
+            transform: translateY(-5px);
+        }
+        
+        .tab-active {
+            position: relative;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .tab-active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        .accordion-item {
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .accordion-header {
+            padding: 16px;
+            background: #f8fafc;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+        
+        .accordion-content {
+            padding: 0 16px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .accordion-content.open {
+            padding: 16px;
+            max-height: 500px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .prompt-level-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .level-beginner {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .level-intermediate {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .level-advanced {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+        
+        .gradient-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+        }
+        
+        .gradient-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
-<body>
-    <header></header>
-    <main>
-        <h1>مرحبا بك</h1>
-  الموقع قيد الانشاء            
-    </main>
-    <footer></footer>
-</body>
-  <meta charset="UTF-8" />
-  <title>Promptica - لوحة التحكم</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <!-- React + ReactDOM -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <!-- Tailwind CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <!-- Fuse.js للبحث الذكي -->
-  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
-  <!-- Internal Styles -->
-  	
-  <style>
-  	/* إصلاح هيكل التبويب لشاشات الموبايل */
-@media (max-width: 768px) {
-  .tab-container {
-    width: 100% !important;
-    max-width: 100vw;
-    overflow-x: auto;
-    box-sizing: border-box;
-    transform: scale(0.98); /* تصغير طفيف للمحتوى إذا لزم الأمر */
-  }
-
-  .tab-header {
-    flex-direction: column;
-    padding: 8px;
-  }
-
-  .tab-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    justify-content: center;
-  }
-
-  .tab-button {
-    padding: 8px 12px;
-    font-size: 14px;
-    min-width: unset;
-    flex: 1 1 auto;
-  }
-
-  .tab-content {
-    padding: 10px;
-    overflow-x: auto;
-  }
-
-  .prompt-card {
-    width: 100%;
-    margin: 8px 0;
-    padding: 12px;
-  }
-
-  .action-buttons {
-    flex-direction: column;
-    gap: 5px;
-  }
-
-  .action-button {
-    width: 100%;
-    margin: 5px 0;
-  }
-  
-  /* إخفاء العناصر غير الضرورية */
-  .non-essential {
-    display: none;
-  }
-}
-    :root {
-      --primary: #4f46e5;
-      --secondary: #7c3aed;
-      --accent: #0ea5e9;
-      --light: #f9fafb;
-      --dark: #1f2937;
-    }
+<body class="min-h-screen bg-gray-50">
+    <!-- شريط التنقل العلوي -->
+    <header class="top-nav">
+        <div class="flex items-center gap-3">
+            <div class="bg-indigo-100 p-2 rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+            </div>
+            <h1 class="text-xl sm:text-2xl font-bold text-indigo-700">Promptica</h1>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            <a href="my-prompt.html" class="hidden md:flex items-center gap-1 text-gray-700 hover:text-indigo-600 transition duration-300">
+                <i class="fas fa-wand-magic-sparkles"></i>
+                <span>اصنع برومبت</span>
+            </a>
+            <a href="promptica-gallery.html" class="hidden md:flex items-center gap-1 text-gray-700 hover:text-indigo-600 transition duration-300">
+                <i class="fas fa-images"></i>
+                <span>المعرض</span>
+            </a>
+            <button id="langToggle" class="flex items-center gap-1 text-gray-700 hover:text-indigo-600 transition duration-300">
+                <i class="fas fa-language"></i>
+                <span>English</span>
+            </button>
+        </div>
+    </header>
     
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #f0f4ff 0%, #e6f7ff 100%);
-      color: var(--dark);
-      line-height: 1.8;
-    }
-    
-    .card {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      transition: all 0.3s ease;
-    }
-    
-    .card:hover {
-      box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
-      transform: translateY(-5px);
-    }
-    
-    .tab-active {
-      position: relative;
-      color: var(--primary);
-      font-weight: 600;
-    }
-    
-    .tab-active::after {
-      content: '';
-      position: absolute;
-      bottom: -8px;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: var(--primary);
-      border-radius: 3px;
-    }
-    
-    .accordion-item {
-      border-radius: 12px;
-      overflow: hidden;
-      margin-bottom: 12px;
-      background: white;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-    
-    .accordion-header {
-      padding: 16px;
-      background: #f8fafc;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 500;
-    }
-    
-    .accordion-content {
-      padding: 0 16px;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-out;
-    }
-    
-    .accordion-content.open {
-      padding: 16px;
-      max-height: 500px;
-      border-top: 1px solid #e2e8f0;
-    }
-    
-    .prompt-level-badge {
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-    
-    .level-beginner {
-      background: #fef3c7;
-      color: #92400e;
-    }
-    
-    .level-intermediate {
-      background: #dbeafe;
-      color: #1e40af;
-    }
-    
-    .level-advanced {
-      background: #ede9fe;
-      color: #5b21b6;
-    }
-    
-    .gradient-btn {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 20px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
-    }
-    
-    .gradient-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
-    }
-    
-    .stat-card {
-      text-align: center;
-      padding: 20px;
-      border-radius: 16px;
-      background: white;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    }
-    
-    .stat-value {
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 10px 0;
-    }
-    
-    .stat-label {
-      color: #64748b;
-      font-size: 0.9rem;
-    }
-    
-    .action-btn {
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    
-    .action-btn:hover {
-      transform: translateY(-2px);
-    }
-  </style>
-</head>
-<body class="min-h-screen p-4 bg-gray-50">
-  <!-- Banner -->
-  <div class="mb-6 rounded-2xl overflow-hidden shadow-xl">
-    <img src="Banner2.png" alt="بانير موقع Promptica" class="w-full h-auto object-cover max-h-56 md:max-h-64">
-  </div>
-  
-  <!-- Header -->
-  <header class="flex flex-col md:flex-row justify-between items-start md:items-center pb-4 border-b border-gray-200 mb-6 gap-4">
-    <div class="flex items-center gap-3">
-      <div class="bg-indigo-100 p-2 rounded-xl">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-        </svg>
-      </div>
-      <h1 class="text-2xl sm:text-3xl font-bold text-indigo-700">Promptica</h1>
+    <!-- البانر -->
+    <div class="mb-6 rounded-2xl overflow-hidden shadow-xl mx-4 mt-4">
+        <img src="Banner2.png" alt="بانير موقع Promptica" class="w-full h-auto object-cover max-h-56 md:max-h-64">
     </div>
     
-    <div class="flex flex-wrap items-center gap-3 rtl:space-x-reverse">
-      <a href="#" onclick="logout()" class="flex items-center gap-1 text-gray-700 hover:text-indigo-600 transition duration-300">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-        </svg>
-        تسجيل الخروج
-      </a>
-      <a href="welcome.html" class="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 transition duration-300">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-        </svg>
-        الترحيب
-      </a>
-      <button id="langToggle" class="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 transition duration-300">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-        </svg>
-        English
-      </button>
-
-  
- 
-          
-              
-                    
-               <div class="container">
-   
-        
-        
-        
-        <div class="section">
-            <div class="small-btn-container">
-                <a href="my-prompt.html" class="small-btn">
-                    <i class="fas fa-wand-magic-sparkles"></i> اصنع برومبت بنفسك
-                </a>
-            </div>
-            
-            <hr class="green-line">
-            
-            <div class="small-btn-container">
-                <a href="promptica-gallery.html" class="small-btn">
-                    <i class="fas fa-images"></i> المعرض
-                </a>
-            </div>
-            
-            <hr class="green-line">
+    <!-- المحتوى الرئيسي -->
+    <div class="container mx-auto max-w-4xl px-4 pb-16">
+        <!-- Root Div for React App -->
+        <div id="root"></div>
     </div>
-            
-     
-                    
- 
-                
-
-<!-- CSS -->
-<style>
-
-.custom-menu .menu li {
-    position: relative;
-}
-
-.custom-menu .menu li:hover {
-    background: #3498db !important;
-    color: #ffffff !important;
-}
-
-.custom-menu .menu li:hover > .submenu {
-    display: block;
-}
-
-.custom-menu .submenu li {
-    height: auto;
-}
-
-.custom-menu .submenu li:hover {
-    background: #3498db !important;
-    color: #ffffff !important;
-}
-                
-</style>
-
     
-  <!-- Root Div for React App -->
-  <div id="root"></div>
-  <!-- Footer -->
-  <footer class="mt-8 pt-4 border-t border-gray-200 text-center text-sm text-gray-500">
-    &copy; <span id="year"></span> Promptica. جميع الحقوق محفوظة.
-    <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
-  </footer>
-  <!-- Logout Function -->
-  <script>
-    function logout() {
-      localStorage.removeItem("loggedInUser");
-      alert("تم تسجيل الخروج.");
-      window.location.href = "login.html";
-    }
-    // تحديد اللغة المحفوظة أو العربية كافتراضية
-    const savedLang = localStorage.getItem('language') || 'ar';
-    document.documentElement.setAttribute('lang', savedLang);
-    document.documentElement.setAttribute('dir', savedLang === 'ar' ? 'rtl' : 'ltr');
-    if (savedLang === 'en') {
-      document.getElementById('langToggle').innerText = 'عربي';
-    } else {
-      document.getElementById('langToggle').innerText = 'English';
-    }
-    // تبديل اللغة
-    function toggleLanguage() {
-      const newLang = savedLang === 'ar' ? 'en' : 'ar';
-      document.documentElement.setAttribute('lang', newLang);
-      document.documentElement.setAttribute('dir', newLang === 'ar' ? 'rtl' : 'ltr');
-      localStorage.setItem('language', newLang);
-      location.reload();
-    }
-    document.getElementById("langToggle").addEventListener("click", toggleLanguage);
-    const [comments, setComments] = useState(JSON.parse(localStorage.getItem('comments')) || []);
-const [filter, setFilter] = useState('all');
-const [showCommentsModal, setShowCommentsModal] = useState(false);
-  </script>
+    <!-- شريط التنقل السفري -->
+    <nav class="bottom-nav">
+        <a href="my-prompt.html" class="nav-item">
+            <i class="fas fa-wand-magic-sparkles"></i>
+            <span>اصنع برومبت</span>
+        </a>
+        <a href="promptica-gallery.html" class="nav-item">
+            <i class="fas fa-images"></i>
+            <span>المعرض</span>
+        </a>
+        <a href="#" onclick="logout()" class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>تسجيل الخروج</span>
+        </a>
+        <a href="welcome.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>الترحيب</span>
+        </a>
+    </nav>
+    
+    <!-- Footer -->
+    <footer class="mt-8 pt-4 border-t border-gray-200 text-center text-sm text-gray-500">
+        &copy; <span id="year"></span> Promptica. جميع الحقوق محفوظة.
+        <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+    </footer>
+    
+    <!-- Logout Function -->
+    <script>
+        function logout() {
+            localStorage.removeItem("loggedInUser");
+            alert("تم تسجيل الخروج.");
+            window.location.href = "login.html";
+        }
+        
+        // تحديد اللغة المحفوظة أو العربية كافتراضية
+        const savedLang = localStorage.getItem('language') || 'ar';
+        document.documentElement.setAttribute('lang', savedLang);
+        document.documentElement.setAttribute('dir', savedLang === 'ar' ? 'rtl' : 'ltr');
+        
+        if (savedLang === 'en') {
+            document.getElementById('langToggle').innerText = 'عربي';
+        } else {
+            document.getElementById('langToggle').innerText = 'English';
+        }
+        
+        // تبديل اللغة
+        function toggleLanguage() {
+            const newLang = savedLang === 'ar' ? 'en' : 'ar';
+            document.documentElement.setAttribute('lang', newLang);
+            document.documentElement.setAttribute('dir', newLang === 'ar' ? 'rtl' : 'ltr');
+            localStorage.setItem('language', newLang);
+            location.reload();
+        }
+        
+        document.getElementById("langToggle").addEventListener("click", toggleLanguage);
+    </script>
 
-  <!-- React Code -->
-  	
-  <script type="text/babel">
-    const { useState, useEffect } = React;
-    function App() {
+    <!-- React Code -->
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        function App() {
  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
  const [feedbackFilter, setFeedbackFilter] = useState('all');
  const [feedbackList, setFeedbackList] = useState([]);
@@ -844,25 +824,18 @@ const saveEditedCategory = () => {
 <div className="bg-white p-6 rounded shadow-md mb-6">
   <h3 className="font-semibold text-lg mb-4">أدوات الإصلاح</h3>
   <button 
-    onClick={() => window.open('debug-All.html', '_blank', 'width=800,height=600')}
+    onClick={() => window.open('debug-storage.html', '_blank', 'width=800,height=600')}
     className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition duration-300"
     
   >
-كل    🔧 البيانات
-  </button>
-    <button 
-    onClick={() => window.open('debug.html', '_blank', 'width=800,height=600')}
-    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition duration-300"
-    
-  >
-    🔧  البيانات
+    🔧اصلاح الاقسام والبيانات
   </button>
     <button 
     onClick={() => window.open('debug-MyPrompt.html', '_blank', 'width=800,height=600')}
     className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition duration-300"
     
   >
-      🔧     إصلاح صفحة المعرض
+    🔧 إصلاح كود MyPromp
   </button>
 </div>
 
@@ -1309,43 +1282,43 @@ const saveEditedCategory = () => {
           </div>
         );
       };
-      return (
-        <div className="container mx-auto max-w-4xl">
-          {/* Tabs Navigation */}
-          <div className="flex space-x-4 rtl:space-x-reverse mb-4 border-b border-gray-200 pb-2">
-            <button
-              onClick={() => setActiveTab('dashboard')}
-              className={`py-2 px-4 font-medium ${
-                activeTab === 'dashboard'
-                  ? 'border-b-2 border-indigo-600 text-indigo-600'
-                  : 'text-gray-600'
-              } transition-all duration-300`}
-            >
-              {translations[language].dashboard}
-            </button>
-            {isUserAdmin && (
-              <button
-                onClick={() => setActiveTab('prompts')}
-                className={`py-2 px-4 font-medium ${
-                  activeTab === 'prompts'
-                    ? 'border-b-2 border-indigo-600 text-indigo-600'
-                    : 'text-gray-600'
-                } transition-all duration-300`}
-              >
-                {translations[language].managePrompts}
-              </button>
-            )}
-          </div>
-           {/* Tab Content */}
-          {activeTab === 'dashboard' && renderDashboard()}
-          {activeTab === 'prompts' && renderManagePrompts()}
-        </div>
-      );
-    }
-    
-
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-  </script>
+       return (
+                <div className="container mx-auto max-w-4xl">
+                    {/* Tabs Navigation */}
+                    <div className="flex space-x-4 rtl:space-x-reverse mb-4 border-b border-gray-200 pb-2">
+                        <button
+                            onClick={() => setActiveTab('dashboard')}
+                            className={`py-2 px-4 font-medium ${
+                                activeTab === 'dashboard'
+                                    ? 'border-b-2 border-indigo-600 text-indigo-600'
+                                    : 'text-gray-600'
+                            } transition-all duration-300`}
+                        >
+                            {translations[language].dashboard}
+                        </button>
+                        {isUserAdmin && (
+                            <button
+                                onClick={() => setActiveTab('prompts')}
+                                className={`py-2 px-4 font-medium ${
+                                    activeTab === 'prompts'
+                                        ? 'border-b-2 border-indigo-600 text-indigo-600'
+                                        : 'text-gray-600'
+                                } transition-all duration-300`}
+                            >
+                                {translations[language].managePrompts}
+                            </button>
+                        )}
+                    </div>
+                    
+                    {/* Tab Content */}
+                    {activeTab === 'dashboard' && renderDashboard()}
+                    {activeTab === 'prompts' && renderManagePrompts()}
+                </div>
+            );
+        }
+        
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
 </body>
 </html>
