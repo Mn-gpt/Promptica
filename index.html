@@ -28,6 +28,61 @@
   <!-- Internal Styles -->
   	
   <style>
+  	/* إصلاح هيكل التبويب لشاشات الموبايل */
+@media (max-width: 768px) {
+  .tab-container {
+    width: 100% !important;
+    max-width: 100vw;
+    overflow-x: auto;
+    box-sizing: border-box;
+    transform: scale(0.98); /* تصغير طفيف للمحتوى إذا لزم الأمر */
+  }
+
+  .tab-header {
+    flex-direction: column;
+    padding: 8px;
+  }
+
+  .tab-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+  }
+
+  .tab-button {
+    padding: 8px 12px;
+    font-size: 14px;
+    min-width: unset;
+    flex: 1 1 auto;
+  }
+
+  .tab-content {
+    padding: 10px;
+    overflow-x: auto;
+  }
+
+  .prompt-card {
+    width: 100%;
+    margin: 8px 0;
+    padding: 12px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .action-button {
+    width: 100%;
+    margin: 5px 0;
+  }
+  
+  /* إخفاء العناصر غير الضرورية */
+  .non-essential {
+    display: none;
+  }
+}
     :root {
       --primary: #4f46e5;
       --secondary: #7c3aed;
