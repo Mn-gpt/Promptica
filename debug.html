@@ -192,31 +192,66 @@
         JSON.stringify(localStorage.getItem('comments'), null, 2) || '[]';
     }
 
-    // تصدير البيانات إلى ملف JSON
-   // في دالة التصدير
-const handleExport = () => {
-  // إنشاء محتوى الملف
-  const data = JSON.stringify(prompts, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
-  
-  // إنشاء رابط قابل للتنزيل
-  const url = URL.createObjectURL(blob);
-  
-  // إنشاء عنصر <a> مخفي
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'prompts-backup.json'; // اسم الملف الافتراضي
-  document.body.appendChild(a);
-  
-  // محاكاة النقر على الرابط
-  a.click();
-  
-  // التنظيف
-  setTimeout(() => {
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }, 100);
+async function exportData() {
+  try {
+    // ... (جمع البيانات كما في الأعلى)
+    
+    // إنشاء واجهة اختيار اسم الملف
+    const fileName = prompt(translations[savedLang].enterFileName, 'promptica_backup_' + new Date().toISOString().slice(0, 10));
+    
+    if (!fileName) return; // إذا ألغى المستخدم
+    
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const fullFileName = fileName.endsWith('.json') ? fileName : fileName + '.json';
+    
+    // استخدام File System Access API إذا كان متاحاً
+    if ('showSaveFilePicker' in window) {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: fullFileName,
+        types: [{
+          description: 'JSON Files',
+          accept: { 'application/json': ['.json'] },
+        }],
+      });
+      
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+    } else {
+      // حل بديل
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fullFileName;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+    }
+    
+    alert(translations[savedLang].exportSuccess);
+  } catch (error) {
+    console.error('Export error:', error);
+    if (error.name !== 'AbortError') {
+      alert(translations[savedLang].exportError);
+    }
+  }
+}
+
+// أضف هذه الترجمات:
+const translations = {
+  ar: {
+    // ... الترجمات الحالية
+    exportSuccess: "تم تصدير البيانات بنجاح",
+    exportError: "حدث خطأ أثناء التصدير",
+    enterFileName: "أدخل اسم الملف:"
+  },
+  en: {
+    // ... الترجمات الحالية
+    exportSuccess: "Data exported successfully",
+    exportError: "Error occurred during export",
+    enterFileName: "Enter file name:"
+  }
 };
+
     // استيراد البيانات من ملف
     function importFromFile(event) {
       const file = event.target.files[0];
