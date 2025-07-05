@@ -193,23 +193,30 @@
     }
 
     // تصدير البيانات إلى ملف JSON
-    function exportData() {
-      const keysToExport = ['categories', 'subCategories', 'prompts', 'comments'];
-      const data = {};
-      keysToExport.forEach(key => {
-        const value = localStorage.getItem(key);
-        if (value) data[key] = JSON.parse(value);
-      });
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'text/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'promptica_backup_' + Date.now() + '.json';
-      a.click();
-      URL.revokeObjectURL(url);
-      alert(translations[savedLang].exportSuccess);
-    }
-
+   // في دالة التصدير
+const handleExport = () => {
+  // إنشاء محتوى الملف
+  const data = JSON.stringify(prompts, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  
+  // إنشاء رابط قابل للتنزيل
+  const url = URL.createObjectURL(blob);
+  
+  // إنشاء عنصر <a> مخفي
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'prompts-backup.json'; // اسم الملف الافتراضي
+  document.body.appendChild(a);
+  
+  // محاكاة النقر على الرابط
+  a.click();
+  
+  // التنظيف
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
+};
     // استيراد البيانات من ملف
     function importFromFile(event) {
       const file = event.target.files[0];
