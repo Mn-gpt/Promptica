@@ -249,8 +249,292 @@
         .action-btn:hover {
             transform: translateY(-2px);
         }
+        /* أيقونة المساعد العائمة */
+#ai-floating-btn {
+  position: fixed;
+  bottom: 85px; /* فوق شريط الأدوات مباشرة */
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #4285F4 0%, #1a73e8 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+  cursor: pointer;
+  z-index: 1001; /* فوق شريط الأدوات */
+  transition: all 0.3s ease;
+}
+
+#ai-floating-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 15px rgba(66, 133, 244, 0.4);
+}
+
+#ai-floating-btn img {
+  width: 30px;
+  height: 30px;
+  filter: invert(1);
+}
+
+/* نافذة المساعد الذكي العائمة */
+#ai-assistant {
+  position: fixed;
+  bottom: 145px; /* فوق الأيقونة العائمة */
+  right: 20px;
+  width: 300px;
+  height: 380px;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  overflow: hidden;
+  transform: translateY(20px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid #e0e0e0;
+}
+
+#ai-assistant.visible {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+#assistant-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: linear-gradient(135deg, #4285F4 0%, #1a73e8 100%);
+  color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.assistant-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.assistant-info img {
+  width: 24px;
+  height: 24px;
+}
+
+.assistant-info h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.assistant-controls button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.assistant-controls button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#assistant-messages {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.message {
+  display: flex;
+  max-width: 90%;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.message.user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.message.bot {
+  align-self: flex-start;
+}
+
+.message .avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  flex-shrink: 0;
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+.message.bot .avatar {
+  background: #4285F4;
+  color: white;
+}
+
+.message.user .avatar {
+  background: #34A853;
+  color: white;
+}
+
+.message .content {
+  margin: 0 8px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  max-width: calc(100% - 40px);
+  position: relative;
+}
+
+.message.bot .content {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-top-left-radius: 4px;
+}
+
+.message.user .content {
+  background-color: #4285F4;
+  color: white;
+  border-top-right-radius: 4px;
+}
+
+.message .content p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.message .content .timestamp {
+  font-size: 9px;
+  text-align: right;
+  margin-top: 4px;
+  opacity: 0.7;
+}
+
+.message.user .content .timestamp {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.message.bot .content .timestamp {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+#assistant-input {
+  padding: 12px;
+  border-top: 1px solid #e0e0e0;
+  background-color: #fff;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+#user-message {
+  flex: 1;
+  border: 1px solid #e0e0e0;
+  border-radius: 24px;
+  padding: 10px 12px;
+  font-family: inherit;
+  resize: none;
+  max-height: 100px;
+  outline: none;
+  transition: border 0.3s;
+  font-size: 13px;
+}
+
+#user-message:focus {
+  border-color: #4285F4;
+  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+}
+
+#send-btn {
+  background-color: #4285F4;
+  color: white;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+  flex-shrink: 0;
+}
+
+#send-btn:hover {
+  background-color: #3367d6;
+}
+
+#send-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: white;
+}
     </style>
 </head>
+<!-- أيقونة المساعد الذكي العائمة -->
+<div id="ai-floating-btn">
+  <img src="https://cdn-icons-png.flaticon.com/512/5968/5968276.png" alt="AI Assistant">
+</div>
+
+<!-- نافذة المساعد الذكي -->
+<div id="ai-assistant">
+  <div id="assistant-header">
+    <div class="assistant-info">
+      <img src="https://cdn-icons-png.flaticon.com/512/5968/5968276.png" alt="Google Gemini Icon">
+      <h3>مساعد promptica الذكي</h3>
+    </div>
+    <div class="assistant-controls">
+      <button id="minimize-btn">➖</button>
+      <button id="close-btn">✕</button>
+    </div>
+  </div>
+  
+  <div id="assistant-messages">
+    <div class="message bot">
+      <div class="avatar">G</div>
+      <div class="content">
+        <p>مرحبا انا مساعد برومبتيكا الذكي ..كيف يمكنني مساعدتك اليوم </p>
+        <div class="timestamp">الآن</div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="assistant-input">
+    <textarea id="user-message" placeholder="اكتب رسالتك هنا..." rows="1"></textarea>
+    <button id="send-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+      </svg>
+    </button>
+  </div>
+</div>
 <body class="min-h-screen bg-gray-50">
     <!-- شريط التنقل العلوي -->
     <header class="top-nav">
@@ -315,8 +599,126 @@
         &copy; <span id="year"></span> Promptica. جميع الحقوق محفوظة.
         <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
     </footer>
+     <script>
+// عناصر واجهة المساعد الذكي
+const assistant = document.getElementById('ai-assistant');
+const floatingBtn = document.getElementById('ai-floating-btn');
+const closeBtn = document.getElementById('close-btn');
+const minimizeBtn = document.getElementById('minimize-btn');
+const sendBtn = document.getElementById('send-btn');
+const userMessageInput = document.getElementById('user-message');
+const messagesContainer = document.getElementById('assistant-messages');
+
+// رابط الخادم الوسيط - تأكد من تحديثه برابطك
+const BACKEND_URL = "https://promptica-backend.onrender.com/generate";
+
+// فتح وإغلاق المساعد
+floatingBtn.addEventListener('click', () => {
+  assistant.classList.add('visible');
+});
+
+closeBtn.addEventListener('click', () => {
+  assistant.classList.remove('visible');
+});
+
+minimizeBtn.addEventListener('click', () => {
+  assistant.classList.remove('visible');
+});
+
+// إرسال الرسالة
+sendBtn.addEventListener('click', sendMessage);
+userMessageInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+// التحكم في ارتفاع حقل الإدخال
+userMessageInput.addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = (this.scrollHeight) + 'px';
+});
+
+async function sendMessage() {
+  const message = userMessageInput.value.trim();
+  if (!message) return;
+  
+  // إضافة رسالة المستخدم
+  addMessage(message, 'user');
+  userMessageInput.value = '';
+  userMessageInput.style.height = 'auto';
+  
+  try {
+    // إظهار مؤشر تحميل
+    const loadingMessage = addMessage('...جارٍ التفكير', 'bot');
     
-    <!-- Logout Function -->
+    // إرسال الطلب إلى الخادم الوسيط
+    const response = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ prompt: message })
+    });
+    
+    const data = await response.json();
+    const botReply = data.candidates[0].content.parts[0].text;
+    
+    // إزالة مؤشر التحمل وإضافة الرد
+    messagesContainer.removeChild(loadingMessage);
+    addMessage(botReply, 'bot');
+  } catch (error) {
+    // إزالة مؤشر التحمل وإضافة رسالة الخطأ
+    messagesContainer.removeChild(loadingMessage);
+    addMessage('حدث خطأ أثناء الاتصال بالخادم. يرجى المحاولة مرة أخرى.', 'bot');
+    console.error('Error:', error);
+  }
+}
+
+function addMessage(text, sender) {
+  const messageDiv = document.createElement('div');
+  messageDiv.classList.add('message', sender);
+  
+  const avatar = document.createElement('div');
+  avatar.classList.add('avatar');
+  avatar.textContent = sender === 'bot' ? 'G' : 'Y';
+  
+  const content = document.createElement('div');
+  content.classList.add('content');
+  
+  const messageText = document.createElement('p');
+  messageText.textContent = text;
+  
+  const timestamp = document.createElement('div');
+  timestamp.classList.add('timestamp');
+  timestamp.textContent = getCurrentTime();
+  
+  content.appendChild(messageText);
+  content.appendChild(timestamp);
+  
+  messageDiv.appendChild(avatar);
+  messageDiv.appendChild(content);
+  
+  messagesContainer.appendChild(messageDiv);
+  
+  // التمرير إلى أحدث رسالة
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  
+  return messageDiv;
+}
+
+function getCurrentTime() {
+  const now = new Date();
+  return `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+}
+
+// إبقاء الخادم نشطًا لتجنب السبات
+function keepAlive() {
+  fetch(BACKEND_URL, { method: 'HEAD' }).catch(console.error);
+}
+
+// تشغيل كل 10 دقائق
+setInterval(keepAlive, 10 * 60 * 1000);
+    </script>
     <script>
         function logout() {
             localStorage.removeItem("loggedInUser");
