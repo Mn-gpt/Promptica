@@ -660,20 +660,40 @@ async function sendMessage() {
       body: JSON.stringify({ prompt: message })
     });
     
+    // تحقق من نجاح الطلب
+    if (!response.ok) {
+      throw new Error(`خطأ في الخادم: ${response.status}`);
+    }
+    
     const data = await response.json();
-    const botReply = data.candidates[0].content.parts[0].text;
+    
+    // التحقق من هيكل الرد
+    let botReply;
+    if (data.candidates && data.candidates.length > 0 && data.candidates[0].content) {
+      botReply = data.candidates[0].content.parts[0].text;
+    } else if (data.error) {
+      botReply = `خطأ: ${data.error}`;
+    } else {
+      botReply = "لم أتمكن من فهم الرد من الخادم";
+    }
     
     // إزالة مؤشر التحمل وإضافة الرد
     messagesContainer.removeChild(loadingMessage);
     addMessage(botReply, 'bot');
+    
   } catch (error) {
     // إزالة مؤشر التحمل وإضافة رسالة الخطأ
-    messagesContainer.removeChild(loadingMessage);
-    addMessage('حدث خطأ أثناء الاتصال بالخادم. يرجى المحاولة مرة أخرى.', 'bot');
+    const errorMessages = document.querySelectorAll('.message.bot');
+    const lastBotMessage = errorMessages[errorMessages.length - 1];
+    
+    if (lastBotMessage && lastBotMessage.querySelector('p').textContent === '...جارٍ التفكير') {
+      messagesContainer.removeChild(lastBotMessage);
+    }
+    
+    addMessage(`حدث خطأ: ${error.message}`, 'bot');
     console.error('Error:', error);
   }
 }
-
 function addMessage(text, sender) {
   const messageDiv = document.createElement('div');
   messageDiv.classList.add('message', sender);
