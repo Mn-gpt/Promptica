@@ -535,6 +535,8 @@
     </button>
   </div>
 </div>
+<!-- ملف المساعد الذكي -->
+<script src="https://cdn.jsdelivr.net/gh/mn-gpt/Promptica@main/assistant.js"></script>
 <body class="min-h-screen bg-gray-50">
     <!-- شريط التنقل العلوي -->
     <header class="top-nav">
@@ -667,15 +669,8 @@ async function sendMessage() {
     
     const data = await response.json();
     
-    // التحقق من هيكل الرد
-    let botReply;
-    if (data.candidates && data.candidates.length > 0 && data.candidates[0].content) {
-      botReply = data.candidates[0].content.parts[0].text;
-    } else if (data.error) {
-      botReply = `خطأ: ${data.error}`;
-    } else {
-      botReply = "لم أتمكن من فهم الرد من الخادم";
-    }
+    // التحقق من هيكل الرد واستخراج النص
+    let botReply = extractGeminiResponse(data);
     
     // إزالة مؤشر التحمل وإضافة الرد
     messagesContainer.removeChild(loadingMessage);
@@ -694,13 +689,39 @@ async function sendMessage() {
     console.error('Error:', error);
   }
 }
+
+// دالة مساعدة لاستخراج الرد من هيكل Gemini
+function extractGeminiResponse(data) {
+  try {
+    // الهيكل الأساسي المتوقع
+    if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+      return data.candidates[0].content.parts[0].text;
+    }
+    
+    // هيكل بديل عند وجود أخطاء
+    if (data.error?.message) {
+      return `خطأ في الخادم: ${data.error.message}`;
+    }
+    
+    // إذا كان هناك رد مباشر (لأغراض التشخيص)
+    if (data.message) {
+      return data.message;
+    }
+    
+    // إذا لم يتم التعرف على الهيكل
+    return "هيكل الرد غير متوقع من الخادم";
+    
+  } catch (e) {
+    return "خطأ في معالجة الرد من الخادم";
+  }
+}
 function addMessage(text, sender) {
   const messageDiv = document.createElement('div');
   messageDiv.classList.add('message', sender);
   
   const avatar = document.createElement('div');
   avatar.classList.add('avatar');
-  avatar.textContent = sender === 'bot' ? 'G' : 'Y';
+  avatar.textContent = sender === 'bot' ? 'P' : 'Y';
   
   const content = document.createElement('div');
   content.classList.add('content');
