@@ -732,12 +732,22 @@ function getCurrentTime() {
 }
 
 // إبقاء الخادم نشطًا لتجنب السبات
-function keepAlive() {
-  fetch(BACKEND_URL, { method: 'HEAD' }).catch(console.error);
+// وظيفة للحفاظ على نشاط الخادم
+function keepServerAlive() {
+  fetch(BACKEND_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({prompt: "حافظ على نشاطي"})
+  })
+  .then(response => console.log("تم إبقاء الخادم نشطًا"))
+  .catch(error => console.error("خطأ في إبقاء الخادم نشطًا:", error));
 }
 
-// تشغيل كل 10 دقائق
-setInterval(keepAlive, 10 * 60 * 1000);
+// تشغيل كل 5 دقائق
+setInterval(keepServerAlive, 5 * 60 * 1000);
+
+// تشغيل فور تحميل الصفحة
+window.addEventListener('load', keepServerAlive);
     </script>
     <script>
         function logout() {
