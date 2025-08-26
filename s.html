@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promptica - روابط مختصرة</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .countdown {
+            font-size: 1.5rem;
+            margin: 20px 0;
+        }
+        .direct-link {
+            display: inline-block;
+            margin: 15px;
+            padding: 10px 20px;
+            background: white;
+            color: #6e8efb;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>جاري تحويلك إلى القسم المطلوب</h1>
+        <div class="countdown">سيتم التوجيه خلال: <span id="countdown">5</span> ثوانٍ</div>
+        <p>إذا لم يتم التوجيه تلقائياً، اضغط على الرابط أدناه</p>
+        <a href="#" id="directLink" class="direct-link">انتقال مباشر</a>
+    </div>
+
+    <script>
+        // قاعدة بيانات الروابط - ضع هنا جميع أقسامك
+        const links = {
+    'ai-business': 'https://mn-gpt.github.io/Promptica/category-prompts.html?category=%D8%A7%D9%84%D8%B0%D9%83%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B5%D9%86%D8%A7%D8%B9%D9%8A%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A3%D8%B9%D9%85%D8%A7%D9%84%20%D9%88%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D9%82&level=all',
+    'ai-education': 'https://mn-gpt.github.io/Promptica/category-prompts.html?category=%D8%A7%D9%84%D8%B0%D9%83%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B5%D9%86%D8%A7%D8%B9%D9%8A%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%AA%D8%B9%D9%84%D9%8A%D9%85%20%D8%A7%D9%84%D8%B0%D9%83%D9%8A&level=all',
+    'ai-software': 'https://mn-gpt.github.io/Promptica/category-prompts.html?category=%D8%A7%D9%84%D8%B0%D9%83%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B5%D9%86%D8%A7%D8%B9%D9%8A%20%D9%81%D9%8A%20%D8%AA%D8%B7%D9%88%D9%8A%D8%B1%20%D8%A7%D9%84%D8%A8%D8%B1%D9%85%D8%AC%D9%8A%D8%A7%D8%AA&level=all',
+    'ai-creativity': 'https://mn-gpt.github.io/Promptica/category-prompts.html?category=%D8%A7%D9%84%D8%B0%D9%83%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B5%D9%86%D8%A7%D8%B9%D9%8A%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D8%A8%D8%AF%D8%A7%D8%B9%20%D9%88%D8%A7%D9%84%D9%81%D9%86&level=all',
+    'ai-health': 'https://mn-gpt.github.io/Promptica/category-prompts.html?category=%D8%A7%D9%84%D8%B0%D9%83%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B5%D9%86%D8%A7%D8%B9%D9%8A%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%B5%D8%AD%D8%A9%20%D9%88%D8%A7%D9%84%D8%B7%D8%A8&level=all',
+    'ai-analysis': 'https://mn-gpt.github.io/Promptica/category-prompts.html?category=%D8%A7%D9%84%D8%B0%D9%83%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B5%D9%86%D8%A7%D8%B9%D9%8A%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%AA%D8%AD%D9%84%D9%8A%D9%84%20%D9%88%D8%A7%D9%84%D8%AA%D9%86%D8%A8%D8%A4&level=all',
+    'ai-robotics': 'https://mn-gpt.github.io/Promptica/category-prompts.html?category=%D8%A7%D9%84%D8%B0%D9%83%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B5%D9%86%D8%A7%D8%B9%D9%8A%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A3%D8%AA%D9%85%D8%AA%D8%A9%20%D8%A7%D9%84%D8%B1%D9%88%D8%A8%D9%88%D8%AA%D8%A7%D8%AA&level=all',
+    'ai-cybersecurity': 'https://mn-gpt.github.io/Promptica/category-prompts.html?category=%D8%A7%D9%84%D8%B0%D9%83%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B5%D9%86%D8%A7%D8%B9%D9%8A%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A3%D9%85%D9%86%20%D8%A7%D9%84%D8%B3%D9%8A%D8%A8%D8%B1%D8%A7%D9%86%D9%8A%20%D9%88%D8%A7%D9%84%D8%AA%D8%AD%D9%82%D9%82%20%D8%A7%D9%84%D8%B0%D9%83%D9%8A&level=all',
+    'ai-media': 'https://mn-gpt.github.io/Promptica/category-prompts.html?category=%D8%A7%D9%84%D8%B0%D9%83%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B5%D9%86%D8%A7%D8%B9%D9%8A%20%D9%81%D9%8A%20%D8%A7%D9%84%D9%85%D8%AD%D8%AA%D9%88%D9%89%20%D9%88%D8%B5%D9%86%D8%A7%D8%B9%D8%A9%20%D8%A7%D9%84%D9%88%D8%B3%D8%A7%D8%A6%D8%B7&level=all',
+    'ai-governance': 'https://mn-gpt.github.io/Promptica/category-prompts.html?category=%D8%A7%D9%84%D8%B0%D9%83%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B5%D9%86%D8%A7%D8%B9%D9%8A%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A5%D8%AF%D8%A7%D8%B1%D8%A9%20%D9%88%D8%A7%D9%84%D8%B3%D9%8A%D8%A7%D8%B3%D8%A7%D8%AA%20%D8%A7%D9%84%D8%B9%D8%A7%D9%85%D8%A9&level=all'
+};
+
+       // استخلاص القسم من جزء الهاش في الرابط
+        const section = window.location.hash.substring(1);
+        
+        // إذا كان القسم موجوداً في القائمة، قم بالتوجيه
+        if (section && links[section]) {
+            // إضافة معلمة للإشارة إلى أن الزائر قادم من رابط مختصر
+            const targetUrl = links[section] + (links[section].includes('?') ? '&' : '?') + 'from=shortlink';
+            document.getElementById('directLink').href = targetUrl;
+            
+            // العد التنازلي للتوجيه التلقائي
+            let countdown = 3;
+            const countdownElement = document.getElementById('countdown');
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    window.location.href = targetUrl;
+                }
+            }, 1000);
+        } else {
+            // إذا لم يكن هناك قسم صالح، عرض رسالة خطأ مع التوجيه إلى الفيسبوك
+            document.querySelector('.container').innerHTML = `
+                <h1>رابط غير صحيح</h1>
+                <p>الرابط المختصر غير صحيح. يرجى التحقق من الرابط والمحاولة مرة أخرى.</p>
+                <div class="countdown">سيتم توجيهك إلى صفحة الفيسبوك خلال: <span id="fb-countdown">5</span> ثوانٍ</div>
+                <a href="https://m.facebook.com/profile.php?id=61577781671204" class="direct-link fb-link">الانتقال إلى الفيسبوك الآن</a>
+                <p>الأقسام المتاحة: ${Object.keys(links).join(', ')}</p>
+            `;
+            
+            // العد التنازلي للتوجيه إلى الفيسبوك
+            let fbCountdown = 5;
+            const fbCountdownElement = document.getElementById('fb-countdown');
+            const fbCountdownInterval = setInterval(() => {
+                fbCountdown--;
+                fbCountdownElement.textContent = fbCountdown;
+                
+                if (fbCountdown <= 0) {
+                    clearInterval(fbCountdownInterval);
+                    window.location.href = 'https://m.facebook.com/profile.php?id=61577781671204';
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
