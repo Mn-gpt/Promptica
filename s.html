@@ -5,71 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Promptica - روابط مختصرة</title>
     <style>
-        /* الأنيميشن */
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
-            padding: 50px;
+            padding: 20px;
             background: linear-gradient(135deg, #6e8efb, #a777e3);
             color: white;
+            min-height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
         }
-        
+        .logo {
+            margin-bottom: 30px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .logo-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .logo-subtext {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-top: -5px;
+        }
         .container {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 500px;
-            width: 90%;
-            animation: fadeIn 0.5s ease-out;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
-        
-        .logo {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 20px;
-            background: linear-gradient(45deg, #6e8efb, #a777e3);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: pulse 2s infinite;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        }
-        
-        .logo-text {
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-        }
-        
         h1 {
             margin-bottom: 20px;
             font-size: 1.8rem;
         }
-        
         .countdown {
             font-size: 1.5rem;
-            margin: 25px 0;
+            margin: 20px 0;
             font-weight: bold;
         }
-        
         .direct-link {
             display: inline-block;
             margin: 15px;
@@ -77,23 +57,34 @@
             background: white;
             color: #6e8efb;
             text-decoration: none;
-            border-radius: 8px;
+            border-radius: 50px;
             font-weight: bold;
             transition: all 0.3s ease;
         }
-        
         .direct-link:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-        
         .fb-link {
             background: #1877F2;
             color: white;
         }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 768px) {
+            .logo-text { font-size: 2rem; }
+            .container { padding: 20px; }
+        }
     </style>
 </head>
 <body>
+    <div class="logo">
+        <div class="logo-text">PROMPTICA</div>
+        <div class="logo-subtext">AI Prompts Marketplace</div>
+    </div>
+	
     <div class="container">
         <h1>جاري تحويلك إلى القسم المطلوب</h1>
         <div class="countdown">سيتم التوجيه خلال: <span id="countdown">5</span> ثوانٍ</div>
