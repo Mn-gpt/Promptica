@@ -518,7 +518,7 @@
   
   <div id="assistant-messages">
     <div class="message bot">
-      <div class="avatar">G</div>
+      <div class="avatar">P</div>
       <div class="content">
         <p>مرحبا انا مساعد برومبتيكا الذكي ..كيف يمكنني مساعدتك اليوم </p>
         <div class="timestamp">الآن</div>
@@ -536,7 +536,7 @@
   </div>
 </div>
 <!-- ملف المساعد الذكي -->
-<script src="https://cdn.jsdelivr.net/gh/mn-gpt/Promptica@main/assistant.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/mn-gpt/Promptica@main/script.js"></script>
 <body class="min-h-screen bg-gray-50">
     <!-- شريط التنقل العلوي -->
     <header class="top-nav">
@@ -1277,7 +1277,7 @@ const saveEditedCategory = () => {
 <div className="bg-white p-6 rounded shadow-md mb-6">
   <h3 className="font-semibold text-lg mb-4">أدوات الإصلاح</h3>
   <button 
-    onClick={() => window.open('debug-storage.html', '_blank', 'width=800,height=600')}
+    onClick={() => window.open('debug-All.html', '_blank', 'width=800,height=600')}
     className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition duration-300"
     
   >
@@ -1801,8 +1801,5 @@ const saveEditedCategory = () => {
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
-<!-- ربط السكريبت الخارجي المؤقت -->
-<script src="hide-prompts.js"></script>
-
 </body>
 </html>
